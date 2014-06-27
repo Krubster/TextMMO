@@ -9,6 +9,8 @@ public class GetIdExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows your id";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

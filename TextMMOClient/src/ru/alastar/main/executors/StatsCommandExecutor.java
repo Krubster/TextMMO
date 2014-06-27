@@ -10,6 +10,8 @@ public class StatsCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows all of your current stats Usage: client stats";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

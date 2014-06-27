@@ -1,6 +1,7 @@
 package ru.alastar.main.net;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 
 import ru.alastar.enums.ActionType;
@@ -37,7 +38,7 @@ import com.esotericsoftware.kryonet.Listener;
 public class TListener extends Listener {
 
 	public static Kryo kryo;
-	public static long packetDelay = (long) 100F;
+	public static float packetDelay = 100F;
 
 	public TListener(EndPoint e) {
 		kryo = e.getKryo();
@@ -53,6 +54,7 @@ public class TListener extends Listener {
 		kryo.register(Entity.class);
 		kryo.register(String.class);
 		kryo.register(ActionType.class);
+	    kryo.register(Integer.class);
 
 		kryo.register(LoginRequest.class);
 		kryo.register(LoginResponse.class);
@@ -84,7 +86,7 @@ public class TListener extends Listener {
 			ConnectedClient c = Server.getClient(connection);
 			if (c != null) {
 				//Main.Log("[INFO]", "CTM - " + System.currentTimeMillis() + " lastPacket - " + c.lastPacket);
-				if ((System.currentTimeMillis() - c.lastPacket) > packetDelay) {
+				if ((new Date().getTime() - c.lastPacket.getTime()) > packetDelay) {
 					if (object instanceof LoginRequest) {
 						Server.Login((LoginRequest) object, connection);
 					} else if (object instanceof ChatSendRequest) {
@@ -106,7 +108,7 @@ public class TListener extends Listener {
 								connection);
 					}
 				}
-				c.lastPacket = System.currentTimeMillis();
+				c.lastPacket = new Date();
 			}
 			else
 				Main.Log("[ERROR]", "Connected client is null");

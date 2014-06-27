@@ -10,6 +10,8 @@ public class InvExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows your inventory";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)
@@ -18,7 +20,7 @@ public class InvExecutor extends CommandExecutor {
 	  Main.Say("-----["+ Client.controlledEntity.caption+"'s inventory]-----");
 	  for(Item i: Client.inventory.values())
 	  {
-		 Main.Say("--["+i.caption+", " +i.amount+ "]--");	  
+		 Main.Say("--["+i.caption+"(ID:"+i.id+"), " +i.amount+ "]--");	  
 	  }
 	  Main.Say("------[0]------");
 	  }catch(Exception e)

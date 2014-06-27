@@ -8,6 +8,7 @@ public class CommandsCommandExecutor extends CommandExecutor {
 	  super();
 	  numOfArgs = 0;
 	  this.description = "Usage: client commands";
+	  this.specificMode = ClientMode.All;
   }
   @Override
   public void execute(String[] args)

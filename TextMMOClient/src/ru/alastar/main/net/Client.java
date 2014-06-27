@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import ru.alastar.game.Entity;
 import ru.alastar.game.Item;
 import ru.alastar.main.Main;
+import ru.alastar.main.executors.ClientMode;
 import ru.alastar.main.net.requests.LoginRequest;
 
 public class Client {
@@ -48,6 +49,7 @@ public class Client {
 	}
 	public static void LoginSuccesful() {
 		//Main.Log("[CLIENT]", "Success!");
+        Main.currentMode = ClientMode.Game;
 		Main.DoGame();
 	}
 	public static void LoginUnsuccesful() {	

@@ -8,6 +8,8 @@ public class NearCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows all near locations Usage: client near";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

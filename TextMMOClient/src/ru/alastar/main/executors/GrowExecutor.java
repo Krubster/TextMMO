@@ -10,6 +10,8 @@ public class GrowExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Tries to grow plants in your location";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

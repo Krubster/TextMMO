@@ -9,6 +9,7 @@ public class AroundCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows all near entities Usage: client around";
+		this.specificMode = ClientMode.Game;
 	}
   @Override
   public void execute(String[] args)

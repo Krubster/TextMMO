@@ -9,6 +9,8 @@ public class MoveCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = -1;
 		this.description = "Moves to the near location Usage: server move {id}";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

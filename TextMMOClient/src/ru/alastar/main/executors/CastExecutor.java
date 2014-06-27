@@ -9,6 +9,8 @@ public class CastExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 1;
 		this.description = "Tries to attack entity in your location";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

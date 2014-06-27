@@ -27,6 +27,13 @@ public class Main {
 	private static void CreateLogFile()
     {
         try {
+            File theDir = new File("logs");
+            if (!theDir.exists()) {
+            try{
+                theDir.mkdir();
+             } catch(SecurityException se){
+             } 
+            }
             dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             String timeLog = dateFormat.format(Calendar.getInstance().getTime());
             

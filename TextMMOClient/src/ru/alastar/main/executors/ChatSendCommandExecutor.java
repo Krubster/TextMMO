@@ -9,6 +9,8 @@ public class ChatSendCommandExecutor extends CommandExecutor {
 	{
 		super();
 		this.description = "Sends message in chat Usage: server say {message}, without brackets";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

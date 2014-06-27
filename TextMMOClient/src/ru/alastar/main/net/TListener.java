@@ -57,6 +57,7 @@ public class TListener extends Listener {
 	   kryo.register(Entity.class);
 	   kryo.register(String.class);
 	   kryo.register(ActionType.class);
+       kryo.register(Integer.class);
 
 	   kryo.register(LoginRequest.class);
 	   kryo.register(LoginResponse.class);
@@ -80,7 +81,7 @@ public class TListener extends Listener {
 	   kryo.register(RemoveFromInventoryResponse.class);
        kryo.register(AddFlagResponse.class);
 
-	 //  Main.Log("[LISTENER]", "All packets registered!");
+       Main.HiddenLog("[LISTENER]","All packets registered!");
    }
    
    public void received(Connection connection, Object object) {
@@ -167,11 +168,11 @@ public class TListener extends Listener {
     	if(!Client.inventory.containsKey(r.id))
     	{
             Client.inventory.remove(r.id);
-            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
+            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount, r.attrs));
     	}
     	else
     	{
-            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
+            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount, r.attrs));
         }
 
     }
@@ -197,7 +198,7 @@ public class TListener extends Listener {
         {
             Location.flags.put(r.flag, r.val);
         }
-    }
+    } 
    }
    
 
@@ -211,5 +212,7 @@ public class TListener extends Listener {
 	public void disconnected(Connection connection) {
 		connection.close();
 		Main.Log("[NETWORK]", "Server closed connection...");
+        Main.HiddenLog("[NETWORK]","Server closed connection...");
+
 	}
 }

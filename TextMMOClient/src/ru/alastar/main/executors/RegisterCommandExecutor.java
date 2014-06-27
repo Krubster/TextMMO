@@ -10,6 +10,8 @@ public class RegisterCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 5;
 		this.description = "Registers on the server Usage: server register {login} {password} {e-mail} {character name} {character type}, without brackets \n Alllowed types: \n  - Human\n  - Orc\n  - Elf\n  - Skeleton";
+	       this.specificMode = ClientMode.Login;
+
 	}
 	  @Override
 	  public void execute(String[] args)

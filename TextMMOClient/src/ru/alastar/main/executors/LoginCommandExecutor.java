@@ -9,6 +9,8 @@ public class LoginCommandExecutor extends CommandExecutor{
 		super();
 		this.numOfArgs = 2;
 		this.description = "Login to the server Usage: server login {login} {password}, without brackets";
+	    this.specificMode = ClientMode.Login;
+
 	}
   @Override
   public void execute(String[] args)

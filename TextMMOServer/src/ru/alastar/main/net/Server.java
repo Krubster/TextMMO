@@ -457,12 +457,20 @@ public class Server {
 				LoginResponse r = new LoginResponse();
 				r.succesful = true;
 				SendTo(c, r);
+				
 				ConnectedClient client = getClient(c);
+	            if(!client.logged){
 				client.login = l.getString("login");
 				client.pass = l.getString("password");
 				client.mail = l.getString("mail");
-
-				LoadPlayer(l.getInt("entityId"), client);
+                client.logged = true;
+				LoadPlayer(l.getInt("entityId"), client);}
+	            else
+	            {
+	                MessageResponse r1 = new MessageResponse();
+	                r1.msg = "This account is already logged in!";
+	                SendTo(c, r1);
+	            }
 			} else {
 				Main.Log("[SERVER]", "...auth unsuccesful(");
 
@@ -570,6 +578,7 @@ public class Server {
 					ir.id = i1.id;
 					ir.captiion = i1.caption;
 					ir.amount = i1.amount;
+					ir.attrs = i1.attributes.values;
 					SendTo(c.connection, ir);
 				}
 				

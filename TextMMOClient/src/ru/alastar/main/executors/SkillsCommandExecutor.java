@@ -9,6 +9,8 @@ public class SkillsCommandExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Shows all of your current skills Usage: client skills";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

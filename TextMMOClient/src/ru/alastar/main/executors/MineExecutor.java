@@ -10,6 +10,8 @@ public class MineExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 0;
 		this.description = "Tries to mine in your location";
+	      this.specificMode = ClientMode.Game;
+
 	}
   @Override
   public void execute(String[] args)

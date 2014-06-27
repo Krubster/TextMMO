@@ -9,6 +9,7 @@ public class AttackExecutor extends CommandExecutor {
 		super();
 		this.numOfArgs = 1;
 		this.description = "Tries to attack target entity Usage: server attack {entity id}";
+	    this.specificMode = ClientMode.Game;
 	}
   @Override
   public void execute(String[] args)
