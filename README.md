@@ -5,7 +5,7 @@ Text MMORPG, written on Java
 
 Including client and server
 
-Very buggy!
+May be very buggy! :P
 
 Dependencies:
 =======
