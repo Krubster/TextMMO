@@ -1257,7 +1257,7 @@ public class Server
 
     }
 
-    public static void EntityDead(Entity entity)
+    public static void EntityDead(Entity entity, Entity from)
     {
         /*
          * Handling entitys death
@@ -1266,7 +1266,7 @@ public class Server
                 + "(" + entity.id + ") dead!");
 
         warnEntity(entity, "==+[You're dead! Next time be more careful]+==");
-
+        
         TravelEntity(entity, getRandomStartLocation());
 
         entity.setRebirthHitsAmount();

@@ -1,6 +1,7 @@
 package ru.alastar.game;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,17 +16,17 @@ import ru.alastar.main.net.Server;
 public class Entity extends Transform
 {
 
-    public int        id        = -1;
-    public String     caption   = "Generic Entity";
-    public EntityType type      = EntityType.Human;
-    public Stats      stats;
-    public Skills     skills;
+    public int               id        = -1;
+    public String            caption   = "Generic Entity";
+    public EntityType        type      = EntityType.Human;
+    public Stats             stats;
+    public Skills            skills;
     public ArrayList<String> knownSpells;
-    
-    
-    public static int startHits = 15;
 
-    public Entity(int i, String c, EntityType t, Location l, Skills sk, Stats st,ArrayList<String> k)
+    public static int        startHits = 15;
+
+    public Entity(int i, String c, EntityType t, Location l, Skills sk,
+            Stats st, ArrayList<String> k)
     {
         super(l);
         this.id = i;
@@ -140,42 +141,45 @@ public class Entity extends Transform
 
     public void tryCast(String spellname, int id2)
     {
-      if(knowSpell(spellname))
-      {
-          if(stats.get("Mana").value >= MagicSystem.getSpell(spellname).manaRequired)
-          {
-              if(Server.haveItemSet(this, MagicSystem.getSpell(spellname).reagentsNeeded)){
-              stats.set("Mana", stats.get("Mana").value - MagicSystem.getSpell(spellname).manaRequired, this, true);
-              for(String s: MagicSystem.getSpell(spellname).reagentsNeeded)
-              {
-                  Server.consumeItem(this, s);
-              }
-              MagicSystem.tryCast(this, Server.getEntity(id2), spellname);
-              }
-              else
-              {
-                  Server.warnEntity(this, "You dont have enough reagents!");
-              }
-          }
-          else
-              Server.warnEntity(this, "You dont have enough mana!");
-      }
-      else
-          Server.warnEntity(this, "You dont know that spell!");
+        if (knowSpell(spellname))
+        {
+            if (stats.get("Mana").value >= MagicSystem.getSpell(spellname).manaRequired)
+            {
+                if (Server.haveItemSet(this,
+                        MagicSystem.getSpell(spellname).reagentsNeeded))
+                {
+                    stats.set(
+                            "Mana",
+                            stats.get("Mana").value
+                                    - MagicSystem.getSpell(spellname).manaRequired,
+                            this, true);
+                    for (String s : MagicSystem.getSpell(spellname).reagentsNeeded)
+                    {
+                        Server.consumeItem(this, s);
+                    }
+                    MagicSystem.tryCast(this, Server.getEntity(id2), spellname);
+                } else
+                {
+                    Server.warnEntity(this, "You dont have enough reagents!");
+                }
+            } else
+                Server.warnEntity(this, "You dont have enough mana!");
+        } else
+            Server.warnEntity(this, "You dont know that spell!");
     }
 
     public boolean knowSpell(String s)
     {
-        for(String str: knownSpells)
+        for (String str : knownSpells)
         {
-            if(str.equals(s))
+            if (str.equals(s))
             {
                 return true;
             }
         }
         return false;
     }
-    
+
     public void tryAttack(Entity e)
     {
         if (e != null)
@@ -196,9 +200,10 @@ public class Entity extends Transform
                     entity.caption + " the " + entity.type.name()
                             + " hit you! Your hits now is: "
                             + this.stats.get("Hits").value);
+          //  startAttack(entity.id);
         } else
         {
-            Server.EntityDead(this);
+            Server.EntityDead(this, entity);
         }
     }
 
@@ -209,37 +214,13 @@ public class Entity extends Transform
 
     public void startAttack(final int id2)
     {
-        ExecutorService service = Executors.newCachedThreadPool();
-        final Entity we = this;
-        service.submit(new Runnable()
+        if (loc.getEntityById(id2) != null)
         {
-            float lastHit = System.currentTimeMillis();
-
-            public void run()
+            if (loc.getEntityById(id2).stats.get("Hits").value > 0)
             {
-                try
-                {
-                    for (;;)
-                    {
-                        if (loc.getEntityById(id2) != null)
-                        {
-                            if (System.currentTimeMillis() - lastHit >= BattleSystem
-                                    .getWeaponSpeed(we))
-                            {
-                                tryAttack(loc.getEntityById(id2));
-                            }
-                        } else
-                        {
-                            break;
-                        }
-                    }
-                } catch (Exception e)
-                {
-                    Server.handleError(e);
-                }
+            tryAttack(loc.getEntityById(id2));
             }
-
-        });
+        }
     }
 
 }
