@@ -688,8 +688,6 @@ public class Server
                     // Main.Log("[SERVER]", "Sending " + l.name + " info");
                     SendTo(c.connection, anlr);
                 }
-                // Main.Log("[SERVER]", "Adding entity to the location...");
-                entity.loc.AddEntity(entity);
                 // Main.Log("[SERVER]", "Sending other entities to it...");
                 entity.loc.SendEntitiesAround(entity);
                 // Main.Log("[SERVER]", "Sending stats...");
