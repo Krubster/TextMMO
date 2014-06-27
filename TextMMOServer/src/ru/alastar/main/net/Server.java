@@ -59,6 +59,7 @@ public class Server
     public static Hashtable<InetSocketAddress, ConnectedClient> clients;
     public static Hashtable<String, World>                      worlds;
     public static Hashtable<Integer, Inventory>                 inventories;
+    public static Hashtable<Integer, Entity>                 entities;
 
     public static Random                                        random;
 
@@ -85,7 +86,8 @@ public class Server
             clients = new Hashtable<InetSocketAddress, ConnectedClient>();
             worlds = new Hashtable<String, World>();
             inventories = new Hashtable<Integer, Inventory>();
-
+            entities = new Hashtable<Integer, Entity>();
+            
             DatabaseClient.Start();
             LoadWorlds();
             LoadEntities();
@@ -379,6 +381,7 @@ public class Server
                             getLocation(allEntities.getInt("locationId")),
                             skills, stats, knownSpells);
                     e.loc.AddEntity(e);
+                    entities.put(e.id, e);
                 }
             }
         } catch (SQLException e)
@@ -688,6 +691,7 @@ public class Server
                     // Main.Log("[SERVER]", "Sending " + l.name + " info");
                     SendTo(c.connection, anlr);
                 }
+                entity.loc.AddEntity(entity);
                 // Main.Log("[SERVER]", "Sending other entities to it...");
                 entity.loc.SendEntitiesAround(entity);
                 // Main.Log("[SERVER]", "Sending stats...");
@@ -729,6 +733,7 @@ public class Server
                 }
 
                 // Main.Log("[SERVER]", "Data was sent to player. Fuf...");
+                entities.put(entity.id, entity);
             }
         } catch (SQLException e1)
         {
@@ -913,7 +918,7 @@ public class Server
                 Server.SendTo(connection, r);
             } else
             {
-                CreateAccount(registerRequest);
+                CreateAccount(registerRequest, getClient(connection));
                 r.successful = true;
                 Server.SendTo(connection, r);
             }
@@ -923,11 +928,13 @@ public class Server
         }
     }
 
-    private static void CreateAccount(RegisterRequest registerRequest)
+    private static void CreateAccount(RegisterRequest registerRequest, ConnectedClient client)
     {
         Entity e = new Entity(getFreeId(), registerRequest.name,
                 registerRequest.type, Server.getRandomStartLocation(),
                 Server.getStandardSkillsSet(), Server.getStandardStatsSet(), new ArrayList<String>());
+        client.controlledEntity = e;
+        entities.put(e.id, e);
         createInventory(e.id);
         saveInventory(inventories.get(e.id));
         saveEntity(e);
@@ -1295,17 +1302,7 @@ public class Server
 
     public static Entity getEntity(int entityId)
     {
-        Entity e;
-        for (World w : worlds.values())
-        {
-            for (Location l : w.locations.values())
-            {
-                e = l.getEntityById(entityId);
-                if (e != null)
-                    return e;
-            }
-        }
-        return null;
+        return entities.get(entityId);
     }
 
     public static void DestroyItem(Item item)

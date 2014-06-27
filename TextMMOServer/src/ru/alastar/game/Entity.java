@@ -28,7 +28,6 @@ public class Entity extends Transform
     public Entity(int i, String c, EntityType t, Location l, Skills sk, Stats st,ArrayList<String> k)
     {
         super(l);
-        l.AddEntity(this);
         this.id = i;
         this.caption = c;
         this.type = t;
@@ -40,6 +39,7 @@ public class Entity extends Transform
     public void RemoveYourself()
     {
         Server.saveEntity(this);
+        Server.entities.remove(id);
         this.loc.RemoveEntity(this);
     }
 
