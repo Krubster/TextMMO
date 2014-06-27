@@ -11,6 +11,7 @@ public class Location {
 	public static String name = "generic location";
 	public static Hashtable<Integer, Entity> entities;
 	public static Hashtable<Integer, String> locationsAround;
+    public static Hashtable<String, String> flags;
 
 	public Location(int i, String n)
 	{
@@ -18,6 +19,7 @@ public class Location {
 		Location.name = n;
 		Location.entities = new Hashtable<Integer, Entity>();
 		Location.locationsAround = new Hashtable<Integer, String>();
+	    Location.flags = new Hashtable<String, String>();
       //  System.out.println("Location was created!");
 	}
 

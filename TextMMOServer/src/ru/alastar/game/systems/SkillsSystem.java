@@ -23,10 +23,9 @@ public class SkillsSystem {
 		float h = Server.random.nextFloat();
 		if(h > s.value / 100)
 		{
-			if(s.value < s.maxValue && s.value + h <= s.maxValue){
-			s.raise((int) h);
-			Server.warnEntity(e, "Your skill ["+s.name+"] have been increased by " + (int)h + ", now it is " + s.value);
-			}
+		    if(s.value + 1 <= s.maxValue){
+			s.raise((int) 1);
+			Server.warnEntity(e, "Your skill ["+s.name+"] have been increased by 1, now it is " + s.value);}
 		}
 	}
 	

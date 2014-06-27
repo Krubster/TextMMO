@@ -38,6 +38,7 @@ import ru.alastar.main.net.requests.CastRequest;
 import ru.alastar.main.net.requests.LoginRequest;
 import ru.alastar.main.net.requests.MoveRequest;
 import ru.alastar.main.net.requests.RegisterRequest;
+import ru.alastar.main.net.responses.AddFlagResponse;
 import ru.alastar.main.net.responses.AddNearLocationResponse;
 import ru.alastar.main.net.responses.AddSkillResponse;
 import ru.alastar.main.net.responses.AddStatResponse;
@@ -116,6 +117,7 @@ public class Server {
 							if ("stop".equals(line.toLowerCase())) {
 								Save();
 								server.close();
+								Main.writer.close();
 								break;
 							}
 						}
@@ -320,15 +322,15 @@ public class Server {
 
 	private static void saveFlag(int id, String s, LocationFlag e) {
 		ResultSet plantsRs = DatabaseClient
-				.commandExecute("SELECT * FROM locationflags WHERE locationId="+ id+ " AND flag="+ s);
+				.commandExecute("SELECT * FROM locationflags WHERE locationId="+ id + " AND flag='"+ s + "'");
 		try {
 			if(plantsRs.next()){
-				DatabaseClient.commandExecute("UPDATE locationflags SET value="
-						+ e.value +"  WHERE locationId=" + id+ " AND name="+ s);
+				DatabaseClient.commandExecute("UPDATE locationflags SET val='"
+						+ e.value + "' WHERE locationId=" + id + " AND flag='"+ s+"'");
 
 			} else {
 				DatabaseClient
-						.commandExecute("INSERT INTO locationflags(locationId, flag, value) VALUES("
+						.commandExecute("INSERT INTO locationflags(locationId, flag, val) VALUES("
 								+ id
 								+ ",'"
 								+  s
@@ -481,7 +483,7 @@ public class Server {
 
 			if (e.next()) {
 				SetData sd = new SetData();
-				Main.Log("[SERVER]", "Creating entity...");
+				//Main.Log("[SERVER]", "Creating entity...");
 				Stats stats = new Stats();
 				Skills skills = new Skills();
 				ResultSet skillsRS = DatabaseClient
@@ -515,37 +517,37 @@ public class Server {
 						e.getString("caption"), EntityType.valueOf(e
 								.getString("type")),
 						getLocation(e.getInt("locationId")), skills, stats);
-				Main.Log("[SERVER]",
-						"Assigning it as a controlled to the connected client...");
+			//	Main.Log("[SERVER]",
+			//			"Assigning it as a controlled to the connected client...");
 				c.controlledEntity = entity;
 				sd.id = entity.id;
-				Main.Log("[SERVER]", "Sending set data packet...");
+			//	Main.Log("[SERVER]", "Sending set data packet...");
 				SendTo(c.connection, sd);
 				LocationInfoResponse lir = new LocationInfoResponse();
 				lir.id = entity.loc.id;
 				lir.name = entity.loc.name;
-				Main.Log("[SERVER]", "Sending load location packet...");
+			//	Main.Log("[SERVER]", "Sending load location packet...");
 				SendTo(c.connection, lir);
 				AddNearLocationResponse anlr;
 				Location l;
-				Main.Log("[SERVER]", "Sending near locations("
-						+ entity.loc.nearLocationsIDs.size() + ", "
-						+ entity.loc.name + ")...");
+			//	Main.Log("[SERVER]", "Sending near locations("
+			//			+ entity.loc.nearLocationsIDs.size() + ", "
+			//			+ entity.loc.name + ")...");
 				for (int i1 = 0; i1 < entity.loc.nearLocationsIDs.size(); ++i1) {
-					Main.Log("[SERVER]", "Selected id is "
-							+ entity.loc.nearLocationsIDs.get(i1));
+			//		Main.Log("[SERVER]", "Selected id is "
+			//				+ entity.loc.nearLocationsIDs.get(i1));
 					l = getLocation(entity.loc.nearLocationsIDs.get(i1));
 					anlr = new AddNearLocationResponse();
 					anlr.id = l.id;
 					anlr.name = l.name;
-					Main.Log("[SERVER]", "Sending " + l.name + " info");
+			//		Main.Log("[SERVER]", "Sending " + l.name + " info");
 					SendTo(c.connection, anlr);
 				}
-				Main.Log("[SERVER]", "Adding entity to the location...");
+			//	Main.Log("[SERVER]", "Adding entity to the location...");
 				entity.loc.AddEntity(entity);
-				Main.Log("[SERVER]", "Sending other entities to it...");
+			//	Main.Log("[SERVER]", "Sending other entities to it...");
 				entity.loc.SendEntitiesAround(entity);
-				Main.Log("[SERVER]", "Sending stats...");
+			//	Main.Log("[SERVER]", "Sending stats...");
 				AddStatResponse r = new AddStatResponse();
 				for (String s : entity.stats.vals.keySet()) {
 					r.name = s;
@@ -553,7 +555,7 @@ public class Server {
 					r.mValue = entity.stats.get(s).maxValue;
 					SendTo(c.connection, r);
 				}
-				Main.Log("[SERVER]", "Sending skills...");
+			//	Main.Log("[SERVER]", "Sending skills...");
 				AddSkillResponse sr = new AddSkillResponse();
 				for (String s : entity.skills.vals.keySet()) {
 					sr.name = s;
@@ -562,7 +564,7 @@ public class Server {
 					SendTo(c.connection, sr);
 
 				}
-				Main.Log("[SERVER]", "Sending inventory...");
+			//	Main.Log("[SERVER]", "Sending inventory...");
 				InventoryResponse ir = new InventoryResponse();
 				for (Item i1 : inventories.get(entity.id).items) {
 					ir.id = i1.id;
@@ -570,7 +572,16 @@ public class Server {
 					ir.amount = i1.amount;
 					SendTo(c.connection, ir);
 				}
-				Main.Log("[SERVER]", "Data was sent to player. Fuf...");
+				
+				AddFlagResponse af = new AddFlagResponse();
+				for(String s: entity.loc.flags.keySet())
+				{
+				    af.flag = s;
+				    af.val = entity.loc.flags.get(s).value;
+                    SendTo(c.connection, af);
+				}
+				
+				//Main.Log("[SERVER]", "Data was sent to player. Fuf...");
 			}
 		} catch (SQLException e1) {
 			handleError(e1);
@@ -584,15 +595,15 @@ public class Server {
 	}
 
 	public static Location getLocation(int int1) {
-		Main.Log("[SERVER]", "Requesting location id " + int1);
+	//	Main.Log("[SERVER]", "Requesting location id " + int1);
 		for (World w : worlds.values()) {
 			if (w.locations.containsKey(int1)) {
-				Main.Log("[SERVER]",
-						"Returning location " + w.locations.get(int1).name);
+		//		Main.Log("[SERVER]",
+		//				"Returning location " + w.locations.get(int1).name);
 				return w.locations.get(int1);
 			}
 		}
-		Main.Log("[SERVER]", "Returning null location!");
+	//	Main.Log("[SERVER]", "Returning null location!");
 		return null;
 	}
 
@@ -787,16 +798,16 @@ public class Server {
 	}
 
 	private static void SaveItem(Item item) {
-		Main.Log("[SAVE ITEM]", "Saving item " + item.caption);
+		Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId=" + item.entityId + " id=" + item.id+ " amount" + item.amount);
 		ResultSet itemEqRS = DatabaseClient
-				.commandExecute("SELECT * FROM items WHERE entityid="
+				.commandExecute("SELECT * FROM items WHERE entityId="
 						+ item.entityId + " AND id="+item.id);
 		try {
 			if (itemEqRS.next()) {
 				DatabaseClient.commandExecute("UPDATE items SET entityId="
 						+ item.entityId + ", locationId=" + item.loc.id
 						+ ", amount=" + item.amount + ", caption='"
-						+ item.caption + "' WHERE id=" + item.id);
+						+ item.caption + "', type='"+item.eqType.name()+"', actionType='"+item.aType.name()+"' WHERE id=" + item.id);
 
 			} else {
 				DatabaseClient
@@ -808,11 +819,13 @@ public class Server {
 								+ item.caption
 								+ "',"
 								+ item.amount
+								+ ", "
+								+ item.entityId
 								+ ",'"
 								+ item.eqType.name()
 								+ "','"
 								+ item.aType.name()
-								+ ")");
+								+ "')");
 			}
 			SaveAttributes(item);
 		} catch (SQLException e) {
@@ -951,9 +964,19 @@ public class Server {
 			anlr.name = l.name;
 			SendTo(c.connection, anlr);
 		}
+
+        
 		c.controlledEntity.loc = location;
 		location.AddEntity(c.controlledEntity);
 		location.SendEntitiesAround(c.controlledEntity);
+		
+        AddFlagResponse af = new AddFlagResponse();
+        for(String s: c.controlledEntity.loc.flags.keySet())
+        {
+            af.flag = s;
+            af.val = c.controlledEntity.loc.flags.get(s).value;
+            SendTo(c.connection, af);
+        }
 	}
 
 	public static void HandleAction(ActionRequest actionRequest,
@@ -1025,7 +1048,7 @@ public class Server {
 	}
 
 	public static void handleError(Exception e) {
-		Main.Log("[ERROR]", e.getLocalizedMessage());
+		Main.Log("[ERROR]", e.getMessage());
 		e.printStackTrace();
 	}
 
@@ -1056,4 +1079,15 @@ public class Server {
 		return null;
 	}
 
+    public static void DestroyItem(Item item)
+    {
+        DatabaseClient.commandExecute("DELETE FROM items WHERE id = "+item.id+" LIMIT 1;");
+        DatabaseClient.commandExecute("DELETE FROM attributes WHERE itemId = "+item.id+";");
+    }
+    
+    public static void DestroyItem(Inventory i, Item item)
+    {
+        i.RemoveItem(item.id);
+        DestroyItem(item);
+    }
 }

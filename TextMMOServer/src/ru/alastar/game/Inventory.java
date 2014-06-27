@@ -37,19 +37,24 @@ public class Inventory implements IContainer
                 if (items.size() + 1 <= maxItems)
                 {
                     items.add(i);
-                } else
+                    st = i;
+                } 
+                else
                 {
                     Server.warnEntity(Server.getEntity(entityId),
                             "Your backpack is full!");
                 }
-            } else
+            }
+            else
             {
+              //  Main.Log("[INVENTORY]", "Items stack exists! Adding items to it. Stack size: " + st.amount + ". Adding " + i.amount);
                 st.amount += i.amount;
+               // Main.Log("[INVENTORY]", "Added! Now its " + st.amount);
             }
             InventoryResponse r = new InventoryResponse();
-            r.amount = i.amount;
-            r.captiion = i.caption;
-            r.id = i.id;
+            r.amount = st.amount;
+            r.captiion = st.caption;
+            r.id = st.id;
             Server.SendTo(
                     Server.getClientByEntity(Server.getEntity(entityId)).connection,
                     r);

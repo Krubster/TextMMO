@@ -15,6 +15,7 @@ import ru.alastar.main.net.requests.LoginRequest;
 import ru.alastar.main.net.requests.MoveRequest;
 import ru.alastar.main.net.requests.RegisterRequest;
 import ru.alastar.main.net.responses.AddEntityResponse;
+import ru.alastar.main.net.responses.AddFlagResponse;
 import ru.alastar.main.net.responses.AddNearLocationResponse;
 import ru.alastar.main.net.responses.AddSkillResponse;
 import ru.alastar.main.net.responses.AddStatResponse;
@@ -36,7 +37,7 @@ import com.esotericsoftware.kryonet.Listener;
 public class TListener extends Listener {
 
 	public static Kryo kryo;
-	public static long packetDelay = 100;
+	public static long packetDelay = (long) 100F;
 
 	public TListener(EndPoint e) {
 		kryo = e.getKryo();
@@ -73,6 +74,7 @@ public class TListener extends Listener {
 		kryo.register(InventoryResponse.class);
 		kryo.register(MessageResponse.class);
 		kryo.register(RemoveFromInventoryResponse.class);
+	    kryo.register(AddFlagResponse.class);
 
 		// Main.Log("[LISTENER]", "All packets registered!");
 	}
@@ -96,7 +98,7 @@ public class TListener extends Listener {
 					} else if (object instanceof ActionRequest) {
 						Server.HandleAction(((ActionRequest) object),
 								connection);
-						Main.Log("[ACTION]", "Handling action: " + ((ActionRequest) object).action.name());
+						//Main.Log("[ACTION]", "Handling action: " + ((ActionRequest) object).action.name());
 					} else if (object instanceof CastRequest) {
 						Server.HandleCast(((CastRequest) object), connection);
 					} else if (object instanceof AttackRequest) {

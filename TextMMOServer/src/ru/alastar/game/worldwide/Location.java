@@ -118,7 +118,7 @@ public class Location {
 				 continue;
 			 }
 		}
-		Item woodItem = new Item(Server.getFreeItemId(), entity.id, allowedWood.get(Server.random.nextInt(allowedWood.size())), Server.random.nextInt(5), this, EquipType.None, ActionType.None, new Attributes());
+		Item woodItem = new Item(Server.getFreeItemId(), entity.id, allowedWood.get(Server.random.nextInt(allowedWood.size())), Server.random.nextInt(4) + 1, this, EquipType.None, ActionType.None, new Attributes());
 	    Inventory inv =  Server.getInventory(entity);
 	    if(inv != null)
 		inv.AddItem(woodItem);;

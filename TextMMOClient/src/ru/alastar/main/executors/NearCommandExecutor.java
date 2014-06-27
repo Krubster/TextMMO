@@ -19,6 +19,10 @@ public class NearCommandExecutor extends CommandExecutor {
 	  {
 		  System.out.println("[You see " + Location.locationsAround.get(i) + " near your location(ID: " +i+ ")]");
 	  }
+	   for(String i: Location.flags.keySet())
+	      {
+	          System.out.println("[You see " +i + " in your location]");
+	      }
 	  }
 	  else
 	  {

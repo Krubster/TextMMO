@@ -48,7 +48,11 @@ public class Entity extends Transform {
     	   {
         	   Server.warnEntity(this, "You chop the tree...");
     		   woodcutter.diffValue("Durability", 1);
-    		   if(SkillsSystem.getChanceFromSkill(this, skills.get("Lumberjacking")) > 0.5)
+    		   if(woodcutter.getAttributeValue("Durability") <= 0)
+    		   {
+    		       Server.DestroyItem(Server.getInventory(this), woodcutter);
+    		   }
+    		   if(SkillsSystem.getChanceFromSkill(this, skills.get("Lumberjacking")) < Server.random.nextFloat())
     		   {
     			   loc.getRandomWood(this, skills.get("Lumberjacking"));
     			   SkillsSystem.tryRaiseSkill(this, skills.get("Lumberjacking"));

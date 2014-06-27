@@ -19,6 +19,7 @@ import ru.alastar.main.net.requests.LoginRequest;
 import ru.alastar.main.net.requests.MoveRequest;
 import ru.alastar.main.net.requests.RegisterRequest;
 import ru.alastar.main.net.responses.AddEntityResponse;
+import ru.alastar.main.net.responses.AddFlagResponse;
 import ru.alastar.main.net.responses.AddNearLocationResponse;
 import ru.alastar.main.net.responses.AddSkillResponse;
 import ru.alastar.main.net.responses.AddStatResponse;
@@ -77,6 +78,7 @@ public class TListener extends Listener {
 	   kryo.register(InventoryResponse.class);
 	   kryo.register(MessageResponse.class);
 	   kryo.register(RemoveFromInventoryResponse.class);
+       kryo.register(AddFlagResponse.class);
 
 	 //  Main.Log("[LISTENER]", "All packets registered!");
    }
@@ -161,11 +163,15 @@ public class TListener extends Listener {
     else if(object instanceof InventoryResponse)
     {
     	InventoryResponse r = (InventoryResponse)object;
+    	
     	if(!Client.inventory.containsKey(r.id))
-    	Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
-    	else{
-        	Client.inventory.remove(r.id);
-        	Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
+    	{
+            Client.inventory.remove(r.id);
+            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
+    	}
+    	else
+    	{
+            Client.inventory.put(r.id, new Item(r.id, r.captiion, r.amount));
         }
 
     }
@@ -178,6 +184,19 @@ public class TListener extends Listener {
     {
     	RemoveFromInventoryResponse r = (RemoveFromInventoryResponse)object;
     	Client.inventory.remove(r.id);
+    }
+    else if(object instanceof AddFlagResponse)
+    {
+        AddFlagResponse r = (AddFlagResponse)object;
+        if(Location.flags.contains(r.flag))
+        {
+            Location.flags.remove(r.flag);
+            Location.flags.put(r.flag, r.val);
+        }
+        else
+        {
+            Location.flags.put(r.flag, r.val);
+        }
     }
    }
    
