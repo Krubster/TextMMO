@@ -9,9 +9,12 @@ Very buggy!
 
 Dependencies:
 =======
-Kryo-net(Min-Log, objnesis, jsonbeans)
-MySQL-connector
-TextMMOEnums
++ Kryo-net
+  + Min-Log
+  + objnesis
+  + jsonbeans
++ MySQL-connector
++ TextMMOEnums
 
 To Do:
 =======
