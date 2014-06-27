@@ -16,7 +16,6 @@ TextMMOEnums
 To Do:
 =======
 - Fix skills formulas
-- Magic system
 - Improve Garden system
 - Add NPCs
 - AI
