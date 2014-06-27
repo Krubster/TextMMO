@@ -17,7 +17,6 @@ To Do:
 =======
 - Fix skills formulas
 - Magic system
-- Mine system
 - Improve Garden system
 - Add NPCs
 - AI
