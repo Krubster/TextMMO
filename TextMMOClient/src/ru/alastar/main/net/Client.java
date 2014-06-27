@@ -5,6 +5,8 @@ import java.util.Hashtable;
 
 import ru.alastar.game.Entity;
 import ru.alastar.game.Item;
+import ru.alastar.game.Skill;
+import ru.alastar.game.Statistic;
 import ru.alastar.main.Main;
 import ru.alastar.main.executors.ClientMode;
 import ru.alastar.main.net.requests.LoginRequest;
@@ -19,6 +21,8 @@ public class Client {
 	public static String password;
 	public static int id = -1;
 	public static Hashtable<Integer, Item> inventory = new Hashtable<Integer, Item>();
+    public static Hashtable<String, Skill> skills = new Hashtable<String, Skill>();
+    public static Hashtable<String, Statistic> stats = new Hashtable<String, Statistic>();
     
 	public static void startClient() {
 		client = new com.esotericsoftware.kryonet.Client();

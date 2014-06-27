@@ -21,9 +21,9 @@ public class StatsCommandExecutor extends CommandExecutor {
 			System.out.println("---* STATS *---");
 			System.out.println(" *---");
 
-	    for(String s: Client.controlledEntity.stats.keySet())
+	    for(String s: Client.stats.keySet())
 	    {
-	    	stat = Client.controlledEntity.stats.get(s);
+	    	stat = Client.stats.get(s);
 	    	System.out.println(" "+s + " - " + stat.value + "/" + stat.maxValue);
 			System.out.println(" *---");
 

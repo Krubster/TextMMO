@@ -3,6 +3,7 @@ package ru.alastar.game;
 import ru.alastar.enums.ActionType;
 import ru.alastar.enums.EquipType;
 import ru.alastar.game.worldwide.Location;
+import ru.alastar.main.net.Server;
 
 public class Item extends Transform {
 
@@ -31,6 +32,7 @@ public class Item extends Transform {
 		this.eqType = et;
 		this.aType = aT;
 		this.attributes = a1;
+		Server.SaveItem(this);
 	}
 
 	public int getLocId() {

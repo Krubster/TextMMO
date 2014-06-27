@@ -85,6 +85,7 @@ public class Server {
 			LoadPlants();
 			GardenSystem.StartGrowTimer();
 			FillWoods();
+			FillMiningItems();
 		} catch (InstantiationException e) {
 			Main.Log("[ERROR]", e.getLocalizedMessage());
 		} catch (IllegalAccessException e) {
@@ -147,6 +148,20 @@ public class Server {
 		Location.woods.put(45, "ash wood");
 		Location.woods.put(50, "greatwood");
 	}
+	
+    private static void FillMiningItems() {
+        Location.miningItems.put(0, "copper ore");
+        Location.miningItems.put(10, "iron ore");
+        Location.miningItems.put(25, "shadow metal ore");
+        Location.miningItems.put(25, "amber");
+        Location.miningItems.put(30, "old corrored golem core");
+        Location.miningItems.put(35, "emerald");
+        Location.miningItems.put(45, "gold ore");
+        Location.miningItems.put(50, "valor ore");
+        Location.miningItems.put(50, "diamond");
+        Location.miningItems.put(50, "swiftstone");
+
+    }
 
 	private static void LoadPlants() {
 		ResultSet plantsRs = DatabaseClient
@@ -806,7 +821,7 @@ public class Server {
 		}
 	}
 
-	private static void SaveItem(Item item) {
+	public static void SaveItem(Item item) {
 		Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId=" + item.entityId + " id=" + item.id+ " amount" + item.amount);
 		ResultSet itemEqRS = DatabaseClient
 				.commandExecute("SELECT * FROM items WHERE entityId="

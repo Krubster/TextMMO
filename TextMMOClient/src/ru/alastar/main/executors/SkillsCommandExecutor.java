@@ -20,9 +20,9 @@ public class SkillsCommandExecutor extends CommandExecutor {
 			System.out.println("---* SKILLS *---");
 			System.out.println(" >--<");
 
-		    for(String s: Client.controlledEntity.skills.keySet())
+		    for(String s: Client.skills.keySet())
 		    {
-		    	skill = Client.controlledEntity.skills.get(s);
+		    	skill = Client.skills.get(s);
 		    	System.out.println(" " +s + " - " + skill.value + "/" + skill.maxValue);
 				System.out.println(" >--<");
 

@@ -24,7 +24,8 @@ public class Location {
 	public Hashtable<String, LocationFlag> flags;
 	public ArrayList<Integer> nearLocationsIDs;
     public static Hashtable<Integer, String> woods = new Hashtable<Integer, String>();
-	
+    public static Hashtable<Integer, String> miningItems = new Hashtable<Integer, String>();
+
 	
 	public Location(int i, String n, ArrayList<Integer> nlIDs,
 			Hashtable<String, LocationFlag> flags) {
@@ -105,23 +106,24 @@ public class Location {
 		 flags.put(string, f);
 	}
 
-	public void getRandomWood(Entity entity, Skill skill) {
-		ArrayList<String> allowedWood = new ArrayList<String>();
-		for(int skillVal: woods.keySet())
-		{
-			 if(skill.value >= skillVal)
-			 {
-				 allowedWood.add(woods.get(skillVal));
-			 }
-			 else
-			 {
-				 continue;
-			 }
-		}
-		Item woodItem = new Item(Server.getFreeItemId(), entity.id, allowedWood.get(Server.random.nextInt(allowedWood.size())), Server.random.nextInt(4) + 1, this, EquipType.None, ActionType.None, new Attributes());
-	    Inventory inv =  Server.getInventory(entity);
-	    if(inv != null)
-		inv.AddItem(woodItem);;
-	}
-
+    public void getRandomMaterial(Entity entity, Skill skill, Hashtable<Integer, String> s)
+    {
+        ArrayList<String> alloweditems = new ArrayList<String>();
+        for(int skillVal: s.keySet())
+        {
+             if(skill.value >= skillVal)
+             {
+                 alloweditems.add(s.get(skillVal));
+             }
+             else
+             {
+                 continue;
+             }
+        }
+        Item item = new Item(Server.getFreeItemId(), entity.id, alloweditems.get(Server.random.nextInt(alloweditems.size())), Server.random.nextInt(4) + 1, this, EquipType.None, ActionType.None, new Attributes());
+        Inventory inv =  Server.getInventory(entity);
+        if(inv != null)
+        inv.AddItem(item);;
+    }
+    
 }

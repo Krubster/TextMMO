@@ -146,19 +146,19 @@ public class TListener extends Listener {
     else if(object instanceof AddStatResponse)
     {
     	AddStatResponse r = (AddStatResponse)object;
-    	if(Client.controlledEntity.stats.containsKey(r.name))
-          Client.controlledEntity.stats.remove(r.name);
+    	if(Client.stats.containsKey(r.name))
+          Client.stats.remove(r.name);
 
-        Client.controlledEntity.stats.put(r.name, new Statistic(r.name, r.sValue, r.mValue));
+        Client.stats.put(r.name, new Statistic(r.name, r.sValue, r.mValue));
 
     }
     else if(object instanceof AddSkillResponse)
     {
     	AddSkillResponse r = (AddSkillResponse)object;
-    	if(Client.controlledEntity.skills.containsKey(r.name))
-            Client.controlledEntity.skills.remove(r.name);
+    	if(Client.skills.containsKey(r.name))
+            Client.skills.remove(r.name);
 
-          Client.controlledEntity.skills.put(r.name, new Skill(r.name, r.sValue, r.mValue));
+          Client.skills.put(r.name, new Skill(r.name, r.sValue, r.mValue));
 	
     }
     else if(object instanceof InventoryResponse)

@@ -52,9 +52,9 @@ public class Entity extends Transform {
     		   {
     		       Server.DestroyItem(Server.getInventory(this), woodcutter);
     		   }
-    		   if(SkillsSystem.getChanceFromSkill(this, skills.get("Lumberjacking")) < Server.random.nextFloat())
+    		   if(SkillsSystem.getChanceFromSkill(this, skills.get("Lumberjacking")) > Server.random.nextFloat())
     		   {
-    			   loc.getRandomWood(this, skills.get("Lumberjacking"));
+    			   loc.getRandomMaterial(this, skills.get("Lumberjacking"), Location.woods);
     			   SkillsSystem.tryRaiseSkill(this, skills.get("Lumberjacking"));
             	   Server.warnEntity(this, "You harvest some wood");
     		   }
@@ -89,7 +89,32 @@ public class Entity extends Transform {
 	public void tryMine() {
 	       if(loc.haveFlag("Mine"))
 	       {
-	    	   
+	           Item pickaxe = Server.checkInventory(this, ActionType.Mine);
+	           if(pickaxe != null)
+	           {
+	               Server.warnEntity(this, "You start to mine...");
+	               pickaxe.diffValue("Durability", 1);
+	               if(pickaxe.getAttributeValue("Durability") <= 0)
+	               {
+	                   Server.DestroyItem(Server.getInventory(this), pickaxe);
+	               }
+	               if(SkillsSystem.getChanceFromSkill(this, skills.get("Mining")) > Server.random.nextFloat())
+	               {
+	                   loc.getRandomMaterial(this, skills.get("Mining"), Location.miningItems);
+	                   SkillsSystem.tryRaiseSkill(this, skills.get("Mining"));
+	                   Server.warnEntity(this, "You found something!");
+	               }
+	               else
+	               {
+	                   Server.warnEntity(this, "You failed to get any useful material");
+	               }
+	           }
+	           else{
+	               Server.warnEntity(this, "You dont have any instrument to perform this action");}
+	       }
+	       else
+	       {
+	           Server.warnEntity(this, "There's no mine");
 	       }
 	}
 
