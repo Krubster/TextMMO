@@ -1,5 +1,6 @@
 package ru.alastar.game.content.entities;
 
-public interface BaseAI {
-	public void update();
+public interface BaseAI
+{
+    public void update();
 }

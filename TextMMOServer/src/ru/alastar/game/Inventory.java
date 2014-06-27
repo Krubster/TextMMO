@@ -41,21 +41,20 @@ public class Inventory implements IContainer
                     r.amount = i.amount;
                     r.captiion = i.caption;
                     r.id = i.id;
-                    Server.SendTo(
-                            Server.getClientByEntity(Server.getEntity(entityId)).connection,
-                            r);
-                } 
-                else
+                    Server.SendTo(Server.getClientByEntity(Server
+                            .getEntity(entityId)).connection, r);
+                } else
                 {
                     Server.warnEntity(Server.getEntity(entityId),
                             "Your backpack is full!");
                 }
-            }
-            else
+            } else
             {
-              //  Main.Log("[INVENTORY]", "Items stack exists! Adding items to it. Stack size: " + st.amount + ". Adding " + i.amount);
+                // Main.Log("[INVENTORY]",
+                // "Items stack exists! Adding items to it. Stack size: " +
+                // st.amount + ". Adding " + i.amount);
                 st.amount += i.amount;
-               // Main.Log("[INVENTORY]", "Added! Now its " + st.amount);
+                // Main.Log("[INVENTORY]", "Added! Now its " + st.amount);
                 InventoryResponse r = new InventoryResponse();
                 r.amount = st.amount;
                 r.captiion = st.caption;
@@ -117,7 +116,7 @@ public class Inventory implements IContainer
     {
         for (Item it : items)
         {
-            if (it.caption == s)
+            if (it.caption.equals(s))
             {
                 return it;
             }
@@ -143,5 +142,16 @@ public class Inventory implements IContainer
     {
         return items;
     }
+
+    public Item getItem(String s)
+    {
+        for (Item it : items)
+        {
+            if (it.caption.equals(s))
+            {
+                return it;
+            }
+        }
+        return null;    }
 
 }

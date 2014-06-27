@@ -2,7 +2,5 @@ package ru.alastar.main.executors;
 
 public enum ClientMode
 {
-   Login,
-   Game,
-   All
+    Login, Game, All
 }

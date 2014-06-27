@@ -9,50 +9,63 @@ import java.util.Calendar;
 
 import ru.alastar.main.net.Server;
 
-public class Main {
+public class Main
+{
 
-    public static File logFile;
-    public static BufferedWriter writer = null;
+    public static File             logFile;
+    public static BufferedWriter   writer = null;
     public static SimpleDateFormat dateFormat;
-    
-	public static void main(String[] args) {
-		try {
-		    CreateLogFile();
-			Server.startServer();
-		} catch (Exception e) {
-			Log("[SERVER]", e.getMessage());
-		}
-	}
 
-	private static void CreateLogFile()
+    public static void main(String[] args)
     {
-        try {
-            File theDir = new File("logs");
-            if (!theDir.exists()) {
-            try{
-                theDir.mkdir();
-             } catch(SecurityException se){
-             } 
-            }
-            dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            String timeLog = dateFormat.format(Calendar.getInstance().getTime());
-            
-            logFile = new File("logs/log-"+timeLog+".txt");
-            writer = new BufferedWriter(new FileWriter(logFile));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-    }
-
-    public static void Log(String prefix, String msg) {
         try
         {
-            writer.write("["+dateFormat.format(Calendar.getInstance().getTime())+"]" + prefix + ":" + msg + "\n");
+            CreateLogFile();
+            Server.startServer();
+        } catch (Exception e)
+        {
+            Log("[SERVER]", e.getMessage());
+        }
+    }
+
+    private static void CreateLogFile()
+    {
+        try
+        {
+            File theDir = new File("logs");
+            if (!theDir.exists())
+            {
+                try
+                {
+                    theDir.mkdir();
+                } catch (SecurityException se)
+                {
+                }
+            }
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String timeLog = dateFormat
+                    .format(Calendar.getInstance().getTime());
+
+            logFile = new File("logs/log-" + timeLog + ".txt");
+            writer = new BufferedWriter(new FileWriter(logFile));
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void Log(String prefix, String msg)
+    {
+        try
+        {
+            writer.write("["
+                    + dateFormat.format(Calendar.getInstance().getTime()) + "]"
+                    + prefix + ":" + msg + "\n");
             System.out.println(prefix + ":" + msg);
             writer.flush();
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-	}
+    }
 }

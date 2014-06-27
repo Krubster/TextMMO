@@ -13,23 +13,25 @@ public class ItemInfoExecutor extends CommandExecutor
         this.description = "Shows item info Usage: client item {id}";
         this.specificMode = ClientMode.Game;
     }
-  @Override
-  public void execute(String[] args)
-  {
-      try{
-      Item i = Client.inventory.get(Integer.parseInt(args[0]));
-      Main.Say("+++++["+i.caption+"]+++++");
-      Main.Say("+++[ID:"+i.id+"]+++");
-      Main.Say("+++[Amount:"+i.amount+"]+++");
 
-      for(String s: i.attributes.keySet())
-      {
-         Main.Say("+++["+ s + " - " + i.attributes.get(s) + "]+++");     
-      }
-      Main.Say("+++++[-]+++++");
-      }catch(Exception e)
-      {
-          System.out.println(this.description);
-      }
-  }
+    @Override
+    public void execute(String[] args)
+    {
+        try
+        {
+            Item i = Client.inventory.get(Integer.parseInt(args[0]));
+            Main.Say("+++++[" + i.caption + "]+++++");
+            Main.Say("+++[ID:" + i.id + "]+++");
+            Main.Say("+++[Amount:" + i.amount + "]+++");
+
+            for (String s : i.attributes.keySet())
+            {
+                Main.Say("+++[" + s + " - " + i.attributes.get(s) + "]+++");
+            }
+            Main.Say("+++++[-]+++++");
+        } catch (Exception e)
+        {
+            System.out.println(this.description);
+        }
+    }
 }

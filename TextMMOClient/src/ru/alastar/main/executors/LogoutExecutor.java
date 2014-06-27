@@ -13,15 +13,17 @@ public class LogoutExecutor extends CommandExecutor
         this.specificMode = ClientMode.Game;
 
     }
-  @Override
-  public void execute(String[] args)
-  {
-      try{
-         Client.client.close();
-         Main.currentMode = ClientMode.Login;
-      }catch(Exception e)
-      {
-          System.out.println(this.description);
-      }
-  }
+
+    @Override
+    public void execute(String[] args)
+    {
+        try
+        {
+            Client.client.close();
+            Main.currentMode = ClientMode.Login;
+        } catch (Exception e)
+        {
+            System.out.println(this.description);
+        }
+    }
 }

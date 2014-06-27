@@ -6,23 +6,25 @@ import ru.alastar.game.Entity;
 
 import com.esotericsoftware.kryonet.Connection;
 
-public class ConnectedClient {
+public class ConnectedClient
+{
 
-	public String login;
-	public String pass;
-	public String mail;
-	
-	public boolean logged = false;
-	
-	public Date lastPacket;
+    public String     login;
+    public String     pass;
+    public String     mail;
 
-	public Connection connection;
+    public boolean    logged = false;
 
-	public Entity controlledEntity;
+    public Date       lastPacket;
 
-	public ConnectedClient(Connection c) {
-		this.connection = c;
-		lastPacket = new Date();
-	}
+    public Connection connection;
+
+    public Entity     controlledEntity;
+
+    public ConnectedClient(Connection c)
+    {
+        this.connection = c;
+        lastPacket = new Date();
+    }
 
 }
