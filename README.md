@@ -7,6 +7,12 @@ Including client and server
 
 Very buggy!
 
+Dependencies:
+=======
+Kryo-net(Min-Log, objnesis, jsonbeans)
+MySQL-connector
+TextMMOEnums
+
 To Do:
 =======
 - Fix skills formulas

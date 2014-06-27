@@ -800,7 +800,7 @@ public class Server {
 
 			} else {
 				DatabaseClient
-						.commandExecute("INSERT INTO items(id, locationId, caption, amount, entityId, type, actionType) VALUES(" // TODO: add fields
+						.commandExecute("INSERT INTO items(id, locationId, caption, amount, entityId, type, actionType) VALUES("
 								+ item.id
 								+ ","
 								+ item.getLocId()
