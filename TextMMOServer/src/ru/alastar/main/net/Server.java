@@ -179,6 +179,7 @@ public class Server
         registerCommand("say", new ChatHandler());
         registerCommand("cast", new CastHandler());
         registerCommand("attack", new AttackHandler());
+        registerCommand("help", new HelpHandler());
 
     }
 
@@ -766,9 +767,13 @@ public class Server
 
     public static void warnEntity(Entity e, String m)
     {
+        try{
         MessageResponse r = new MessageResponse();
         r.msg = m;
-        SendTo(getClientByEntity(e).connection, r);
+        SendTo(getClientByEntity(e).connection, r);}catch(Exception er)
+        {
+            handleError(er);
+        }
     }
 
     public static Location getLocation(int int1)
@@ -1427,7 +1432,7 @@ public class Server
         }
     }
 
-    private static void warnClient(ConnectedClient client, String string)
+    public static void warnClient(ConnectedClient client, String string)
     {
         MessageResponse r = new MessageResponse();
         r.msg = string;

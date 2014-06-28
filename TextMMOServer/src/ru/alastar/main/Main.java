@@ -19,7 +19,7 @@ public class Main
     public static BufferedWriter   writer = null;
     public static SimpleDateFormat dateFormat;
     public static ExecutorService  service;
-    public static String           version = "1.15.1";
+    public static String           version = "1.15.2";
     public static ArrayList<String>authors = new ArrayList<String>();
     
     public static void main(String[] args)

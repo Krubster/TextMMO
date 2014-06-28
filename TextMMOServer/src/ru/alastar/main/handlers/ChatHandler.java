@@ -8,7 +8,6 @@ public class ChatHandler extends Handler
 {
   public ChatHandler()
   {
-      this.numOfArgs = 1;
       this.description = "Sends message in the chat";
   }
   
@@ -16,10 +15,12 @@ public class ChatHandler extends Handler
   public void execute(String[] args, Connection c)
   {
    try{
-       if((args.length - 1) == numOfArgs)
-       {
-           Server.ProcessChat(args[1], c);
-       }
+           String msg = "";
+           for(int i = 1; i < args.length; ++i)
+           {
+               msg += " " + args[i];
+           }
+           Server.ProcessChat(msg, c);
    }catch(Exception e)
    {
        Server.handleError(e);
