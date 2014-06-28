@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 
@@ -16,6 +17,7 @@ import ru.alastar.main.executors.AroundCommandExecutor;
 import ru.alastar.main.executors.AttackExecutor;
 import ru.alastar.main.executors.CastExecutor;
 import ru.alastar.main.executors.ChatSendCommandExecutor;
+import ru.alastar.main.executors.ClientInfoExecutor;
 import ru.alastar.main.executors.ClientMode;
 import ru.alastar.main.executors.CommandExecutor;
 import ru.alastar.main.executors.CommandsCommandExecutor;
@@ -51,11 +53,16 @@ public class Main
     public static File                               logFile;
     public static BufferedWriter                     writer         = null;
     public static SimpleDateFormat                   dateFormat;
-
+    
+    public static String                             version = "1.14.1";
+    public static ArrayList<String>                  authors = new ArrayList<String>();
     public static void main(String[] args)
     {
         try
         {
+            authors.add("Old Man(Alex) - idea creator");
+            authors.add("Alastar(Michael Gess) - programmer");
+
             SetUpLog();
             RegisterCommands();
             Client.startClient();
@@ -125,7 +132,8 @@ public class Main
         serverCommands.put("cast", new CastExecutor());
         serverCommands.put("attack", new AttackExecutor());
         serverCommands.put("logout", new LogoutExecutor());
-
+        
+        clientCommands.put("info", new ClientInfoExecutor());
         clientCommands.put("id", new GetIdExecutor());
         clientCommands.put("around", new AroundCommandExecutor());
         clientCommands.put("near", new NearCommandExecutor());
@@ -153,7 +161,13 @@ public class Main
                 {
                     clientCommands.get(line.split(" ")[1].toLowerCase())
                             .execute(args);
-                } else
+                } else if(clientCommands.get(line.split(" ")[1]
+                        .toLowerCase()).specificMode == ClientMode.All)
+                {
+                    clientCommands.get(line.split(" ")[1].toLowerCase())
+                    .execute(args);
+                }
+                else
                 {
                     System.out.println("Cannot use this command now");
                 }
@@ -173,7 +187,15 @@ public class Main
                 {
                     serverCommands.get(line.split(" ")[1].toLowerCase())
                             .execute(args);
-                } else
+                } 
+                else if(serverCommands.get(line.split(" ")[1]
+                        .toLowerCase()).specificMode == ClientMode.All)
+                {
+                    serverCommands.get(line.split(" ")[1].toLowerCase())
+                    .execute(args);
+                }
+                
+                else
                 {
                     System.out.println("Cannot use this command now");
 

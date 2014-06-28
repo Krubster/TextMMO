@@ -1,6 +1,7 @@
 package ru.alastar.main.net;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import ru.alastar.game.Entity;
@@ -24,6 +25,8 @@ public class Client
     public static Hashtable<Integer, Item>            inventory = new Hashtable<Integer, Item>();
     public static Hashtable<String, Skill>            skills    = new Hashtable<String, Skill>();
     public static Hashtable<String, Statistic>        stats     = new Hashtable<String, Statistic>();
+
+
 
     public static void startClient()
     {

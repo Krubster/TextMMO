@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,13 +19,23 @@ public class Main
     public static BufferedWriter   writer = null;
     public static SimpleDateFormat dateFormat;
     public static ExecutorService  service;
+    public static String           version = "1.15.0";
+    public static ArrayList<String>authors = new ArrayList<String>();
     
     public static void main(String[] args)
     {
         try
         {
-            service = Executors.newCachedThreadPool();
+            service = Executors.newCachedThreadPool(); 
             CreateLogFile();
+            authors.add("Old Man(Alex) - idea creator");
+            authors.add("Alastar(Michael Gess) - programmer");
+            Log("[SERVER]", "Game server version " + version + " starting");
+            Log("[SERVER]", "Dont forget to give thanks to the authors: ");
+            for(String s: Main.authors)
+            {
+                Log("[AUTHOR]", s);
+            }
             Server.startServer();
         } catch (Exception e)
         {
