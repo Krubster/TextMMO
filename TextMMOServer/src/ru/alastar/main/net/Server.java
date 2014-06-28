@@ -36,12 +36,8 @@ import ru.alastar.game.worldwide.Location;
 import ru.alastar.game.worldwide.LocationFlag;
 import ru.alastar.game.worldwide.World;
 import ru.alastar.main.Main;
-import ru.alastar.main.net.requests.ActionRequest;
-import ru.alastar.main.net.requests.AttackRequest;
-import ru.alastar.main.net.requests.CastRequest;
-import ru.alastar.main.net.requests.LoginRequest;
-import ru.alastar.main.net.requests.MoveRequest;
-import ru.alastar.main.net.requests.RegisterRequest;
+import ru.alastar.main.handlers.*;
+import ru.alastar.main.net.requests.CommandRequest;
 import ru.alastar.main.net.responses.AddFlagResponse;
 import ru.alastar.main.net.responses.AddNearLocationResponse;
 import ru.alastar.main.net.responses.AddSkillResponse;
@@ -61,7 +57,8 @@ public class Server
     public static Hashtable<InetSocketAddress, ConnectedClient> clients;
     public static Hashtable<String, World>                      worlds;
     public static Hashtable<Integer, Inventory>                 inventories;
-    public static Hashtable<Integer, Entity>                 entities;
+    public static Hashtable<Integer, Entity>                    entities;
+    public static Hashtable<String, Handler>                     commands;
 
     public static Random                                        random;
 
@@ -89,7 +86,8 @@ public class Server
             worlds = new Hashtable<String, World>();
             inventories = new Hashtable<Integer, Inventory>();
             entities = new Hashtable<Integer, Entity>();
-            
+            commands = new Hashtable<String, Handler>();
+
             DatabaseClient.Start();
             LoadWorlds();
             LoadEntities();
@@ -99,6 +97,7 @@ public class Server
             FillWoods();
             FillMiningItems();
             SetupSpells();
+            FillCommands();
 
         } catch (InstantiationException e)
         {
@@ -171,6 +170,28 @@ public class Server
         }
     }
 
+    private static void FillCommands()
+    {
+        registerCommand("login", new LoginHandler());
+        registerCommand("register", new RegisterHandler());
+        registerCommand("move", new MoveHandler());
+        registerCommand("act", new ActionHandler());
+        registerCommand("say", new ChatHandler());
+        registerCommand("cast", new CastHandler());
+        registerCommand("attack", new AttackHandler());
+
+    }
+
+    public static void registerCommand(String key, Handler h)
+    {
+        try{
+            commands.put(key, h);
+        }catch(Exception e)
+        {
+            handleError(e);
+        }
+    }
+    
     private static void SetupSpells()
     {
         MagicSystem.addSpell("heal", new Heal());
@@ -563,14 +584,14 @@ public class Server
         clients.remove(connection.getRemoteAddressUDP());
     }
 
-    public static void Login(LoginRequest object, Connection c)
+    public static void Login(String login, String pass, Connection c)
     {
         try
         {
         //    Main.Log("[SERVER]", "Process auth...");
             ResultSet l = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + object.login + "' AND password='" + object.pass
+                            + login + "' AND password='" + pass
                             + "'");
             if (l.next())
             {
@@ -903,15 +924,15 @@ public class Server
         }
     }
 
-    public static void ProcessRegister(RegisterRequest registerRequest,
+    public static void ProcessRegister(String login, String pass, String mail, String name, String race,
             Connection connection)
     {
         try
         {
             ResultSet regRS = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + registerRequest.login + "' AND mail='"
-                            + registerRequest.mail + "'");
+                            + login + "' AND mail='"
+                            + mail + "'");
             RegisterResponse r = new RegisterResponse();
 
             if (regRS.next())
@@ -920,7 +941,7 @@ public class Server
                 Server.SendTo(connection, r);
             } else
             {
-                CreateAccount(registerRequest, getClient(connection));
+                CreateAccount(login, pass, mail, name, race, getClient(connection));
                 r.successful = true;
                 Server.SendTo(connection, r);
             }
@@ -930,10 +951,11 @@ public class Server
         }
     }
 
-    private static void CreateAccount(RegisterRequest registerRequest, ConnectedClient client)
+    private static void CreateAccount(String login, String pass, String mail, String name, String race, ConnectedClient client)
     {
-        Entity e = new Entity(getFreeId(), registerRequest.name,
-                registerRequest.type, Server.getRandomStartLocation(),
+        try{
+        Entity e = new Entity(getFreeId(), name,
+                EntityType.valueOf(race), Server.getRandomStartLocation(),
                 Server.getStandardSkillsSet(), Server.getStandardStatsSet(), new ArrayList<String>());
         client.controlledEntity = e;
         entities.put(e.id, e);
@@ -942,10 +964,14 @@ public class Server
         saveEntity(e);
         DatabaseClient
                 .commandExecute("INSERT INTO accounts(login, password, mail, entityId) VALUES('"
-                        + registerRequest.login
+                        + login
                         + "','"
-                        + registerRequest.pass
-                        + "','" + registerRequest.mail + "'," + e.id + ")");
+                        + pass
+                        + "','" + mail + "'," + e.id + ")");
+        }catch(Exception e)
+        {
+            handleError(e);
+        }
     }
 
     private static void createInventory(int id)
@@ -1154,7 +1180,7 @@ public class Server
         return -1;
     }
 
-    public static void HandleMove(MoveRequest moveRequest, Connection connection)
+    public static void HandleMove(int id, Connection connection)
     {
         ConnectedClient c = getClient(connection);
         // Main.Log("[MOVE]", "ID: " + moveRequest.id);
@@ -1163,13 +1189,17 @@ public class Server
         // Main.Log("[MOVE]", "nlID: " + near);
 
         // }
-        if (c.controlledEntity.loc.nearLocationsIDs.contains(moveRequest.id))
+        try{
+        if (c.controlledEntity.loc.nearLocationsIDs.contains(id))
         {
             c.controlledEntity.loc.RemoveEntity(c.controlledEntity);
-            MovePlayerAt(getLocation(moveRequest.id), c);
+            MovePlayerAt(getLocation(id), c);
         } else
         {
             Main.Log("[ERROR]", "There's no near location with that id");
+        }}catch(Exception e)
+        {
+            handleError(e);
         }
     }
 
@@ -1203,13 +1233,13 @@ public class Server
         }
     }
 
-    public static void HandleAction(ActionRequest actionRequest,
+    public static void HandleAction(ActionType action,
             Connection connection)
     {
         try
         {
             ConnectedClient c = getClient(connection);
-            switch (actionRequest.action)
+            switch (action)
             {
                 case Cut:
                     c.controlledEntity.tryCut();
@@ -1235,25 +1265,24 @@ public class Server
 
     }
 
-    public static void HandleCast(CastRequest castRequest, Connection connection)
+    public static void HandleCast(String spellName, int eId, Connection connection)
     {
         try
         {
             ConnectedClient c = getClient(connection);
-            c.controlledEntity.tryCast(castRequest.spellId.toLowerCase(), castRequest.id);
+            c.controlledEntity.tryCast(spellName.toLowerCase(), eId);
         } catch (Exception e)
         {
             handleError(e);
         }
     }
 
-    public static void HandleAttack(AttackRequest attackRequest,
-            Connection connection)
+    public static void HandleAttack(int id,Connection connection)
     {
         try
         {
             ConnectedClient c = getClient(connection);
-            c.controlledEntity.startAttack(attackRequest.id);
+            c.controlledEntity.startAttack(id);
         } catch (Exception e)
         {
             handleError(e);
@@ -1379,5 +1408,41 @@ public class Server
            else
                --item.amount;
         }
+    }
+
+    public static void HandleCommand(CommandRequest commandRequest,
+            Connection connection)
+    {
+        try{
+        String commandKey = commandRequest.args[0];
+        if(Server.commands.containsKey(commandKey)){
+        Server.commands.get(commandKey).execute(commandRequest.args, connection);}
+        else
+        {
+            Server.warnClient(getClient(connection), "Invalid server command");
+        }
+        }catch(Exception e)
+        {
+            handleError(e);
+        }
+    }
+
+    private static void warnClient(ConnectedClient client, String string)
+    {
+        MessageResponse r = new MessageResponse();
+        r.msg = string;
+        SendTo(client.connection, r);
+    }
+
+    public static ActionType getActionFromString(String string)
+    {
+        for(ActionType aT: ActionType.values())
+        {
+            if(aT.name().toLowerCase().contains(string))
+            {
+                return aT;
+            }
+        }
+        return ActionType.None;
     }
 }

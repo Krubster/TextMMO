@@ -1,7 +1,6 @@
 package ru.alastar.main.net;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import ru.alastar.game.Entity;
@@ -10,7 +9,6 @@ import ru.alastar.game.Skill;
 import ru.alastar.game.Statistic;
 import ru.alastar.main.Main;
 import ru.alastar.main.executors.ClientMode;
-import ru.alastar.main.net.requests.LoginRequest;
 
 public class Client
 {
@@ -51,14 +49,14 @@ public class Client
         }
     }
 
-    public static void DoLogin()
+  /*  public static void DoLogin()
     {
         System.out.println("Logging in...");
         LoginRequest r = new LoginRequest();
         r.login = login;
         r.pass = password;
         Send(r);
-    }
+    }*/
 
     public static void Send(Object o)
     {

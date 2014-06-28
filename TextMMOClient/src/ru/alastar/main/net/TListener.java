@@ -11,13 +11,7 @@ import ru.alastar.game.Skill;
 import ru.alastar.game.Statistic;
 import ru.alastar.game.worldwide.Location;
 import ru.alastar.main.Main;
-import ru.alastar.main.net.requests.ActionRequest;
-import ru.alastar.main.net.requests.AttackRequest;
-import ru.alastar.main.net.requests.CastRequest;
-import ru.alastar.main.net.requests.ChatSendRequest;
-import ru.alastar.main.net.requests.LoginRequest;
-import ru.alastar.main.net.requests.MoveRequest;
-import ru.alastar.main.net.requests.RegisterRequest;
+import ru.alastar.main.net.requests.CommandRequest;
 import ru.alastar.main.net.responses.AddEntityResponse;
 import ru.alastar.main.net.responses.AddFlagResponse;
 import ru.alastar.main.net.responses.AddNearLocationResponse;
@@ -60,28 +54,23 @@ public class TListener extends Listener
         kryo.register(String.class);
         kryo.register(ActionType.class);
         kryo.register(Integer.class);
+        kryo.register(String[].class);
 
-        kryo.register(LoginRequest.class);
         kryo.register(LoginResponse.class);
         kryo.register(AddEntityResponse.class);
         kryo.register(LocationInfoResponse.class);
         kryo.register(AddNearLocationResponse.class);
         kryo.register(SetData.class);
-        kryo.register(ChatSendRequest.class);
         kryo.register(ChatSendResponse.class);
         kryo.register(RemoveEntityResponse.class);
-        kryo.register(RegisterRequest.class);
         kryo.register(RegisterResponse.class);
         kryo.register(AddStatResponse.class);
         kryo.register(AddSkillResponse.class);
-        kryo.register(MoveRequest.class);
-        kryo.register(ActionRequest.class);
-        kryo.register(CastRequest.class);
-        kryo.register(AttackRequest.class);
         kryo.register(InventoryResponse.class);
         kryo.register(MessageResponse.class);
         kryo.register(RemoveFromInventoryResponse.class);
         kryo.register(AddFlagResponse.class);
+        kryo.register(CommandRequest.class);
 
         Main.HiddenLog("[LISTENER]", "All packets registered!");
     }
