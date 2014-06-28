@@ -9,11 +9,11 @@ public class SkillsSystem
 
     public static float getChanceFromSkill(Entity e, Skill s)
     {
-        float c = 0.25F;
+        float c = 0.15F;
+        
         if (s.value > 0)
             c += s.value / 100;
-        else
-            c += 1;
+
         return c;
 
     }
@@ -21,7 +21,7 @@ public class SkillsSystem
     public static void tryRaiseSkill(Entity e, Skill s)
     {
         float h = Server.random.nextFloat();
-        if (h > s.value / 100)
+        if (h > s.value / 100 + 0.5)
         {
             if (s.value + 1 <= s.maxValue)
             {

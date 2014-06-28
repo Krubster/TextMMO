@@ -36,12 +36,12 @@ public class Location
         this.flags = new Hashtable<String, LocationFlag>();
         this.nearLocationsIDs = nlIDs;
         this.flags = flags;
-        Main.Log("[SERVER]", "Near Locations IDs(" + nearLocationsIDs.size()
+       /* Main.Log("[SERVER]", "Near Locations IDs(" + nearLocationsIDs.size()
                 + ") in " + name + " is - ");
         for (int i1 : nearLocationsIDs)
         {
             System.out.println(i1);
-        }
+        }*/
     }
 
     public Entity getEntityById(int i)

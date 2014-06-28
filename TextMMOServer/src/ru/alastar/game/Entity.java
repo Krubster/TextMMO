@@ -1,9 +1,8 @@
 package ru.alastar.game;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.alastar.enums.ActionType;
 import ru.alastar.enums.EntityType;
@@ -23,8 +22,12 @@ public class Entity extends Transform
     public Skills            skills;
     public ArrayList<String> knownSpells;
 
+    public boolean           invul = false;
+    public float             invulTime = 15; // in seconds
     public static int        startHits = 15;
-
+    public Timer             battleTimer;
+    public Entity            target;
+    
     public Entity(int i, String c, EntityType t, Location l, Skills sk,
             Stats st, ArrayList<String> k)
     {
@@ -35,6 +38,8 @@ public class Entity extends Transform
         this.skills = sk;
         this.stats = st;
         this.knownSpells = k;
+        battleTimer = null;
+        target = null;
     }
 
     public void RemoveYourself()
@@ -184,13 +189,31 @@ public class Entity extends Transform
     {
         if (e != null)
         {
+            if(SkillsSystem.getChanceFromSkill(this, this.skills.vals.get("Swords")) > Server.random.nextFloat()){
             e.dealDamage(this, BattleSystem.calculateDamage(this, e));
             Server.warnEntity(this, "You trying to hit " + e.caption + "...");
+            SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Swords"));
+            }
+            else
+            {
+                Server.warnEntity(this, "You miss!");
+                SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Swords"));
+            }
         }
     }
 
     private void dealDamage(Entity entity, int calculateDamage)
     {
+        if(SkillsSystem.getChanceFromSkill(this, this.skills.vals.get("Parrying")) > Server.random.nextFloat()){
+            Server.warnEntity(
+                    this,     
+                    "You successfully parried " + entity.caption + "'s attack!");
+            SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Parrying"));
+            startAttack(entity.id);
+
+        }
+        else
+        {
         int curHits = this.stats.get("Hits").value;
         if ((curHits - calculateDamage) > 0)
         {
@@ -200,10 +223,15 @@ public class Entity extends Transform
                     entity.caption + " the " + entity.type.name()
                             + " hit you! Your hits now is: "
                             + this.stats.get("Hits").value);
-          //  startAttack(entity.id);
+            SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Parrying"));
+            
+            if(target == null)
+             startAttack(entity.id);
+            
         } else
         {
             Server.EntityDead(this, entity);
+        }
         }
     }
 
@@ -212,15 +240,49 @@ public class Entity extends Transform
         this.stats.set("Hits", startHits, this, true);
     }
 
+    public void tryStopAttack()
+    {
+        if(battleTimer != null)
+        battleTimer.cancel();  
+    }
+    
     public void startAttack(final int id2)
     {
-        if (loc.getEntityById(id2) != null)
-        {
-            if (loc.getEntityById(id2).stats.get("Hits").value > 0)
-            {
-            tryAttack(loc.getEntityById(id2));
-            }
-        }
+       // System.out.println("Start Attack. Weapon speed: " + (long)BattleSystem.getWeaponSpeed(this)*1000);
+        if(battleTimer != null)
+        battleTimer.cancel();
+        
+        battleTimer = new Timer();
+        battleTimer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                      //  System.out.println("Attack run");
+                        if (loc.getEntityById(id2) != null)
+                        {
+                            target = loc.getEntityById(id2);
+                            if (target.stats.get("Hits").value > 0)
+                            {
+                                if(!target.invul){
+                              //      System.out.println("hit it");
+                                tryAttack(target);
+                                }
+                                else{
+                                    target = null;
+                                    battleTimer.cancel();
+                                    }
+                            } else{
+                                target = null;
+                                battleTimer.cancel();
+                                }
+                        }
+                        else
+                        {
+                          //  System.out.println("entity null");
+                            target = null;
+                            battleTimer.cancel();
+                        }
+                    }
+                  }, 0, (long)BattleSystem.getWeaponSpeed(this)*1000);
     }
 
 }

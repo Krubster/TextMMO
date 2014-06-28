@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -469,38 +471,38 @@ public class Server
                         "Loading world " + worlds.getString("name") + "...");
                 while (locations.next())
                 {
-                    Main.Log("[SERVER]", "Clearing nlIDs...");
+                 //   Main.Log("[SERVER]", "Clearing nlIDs...");
                     nlIDs = new ArrayList<Integer>();
-                    Main.Log("[SERVER]",
-                            "Getting IDs string and splitting it...");
+                  //  Main.Log("[SERVER]",
+                 //           "Getting IDs string and splitting it...");
                     locsIDsInStr = locations.getString("nearLocationsIDs")
                             .split(";");
-                    Main.Log("[SERVER]", "Iterating this string...");
+                 //   Main.Log("[SERVER]", "Iterating this string...");
                     for (int i = 0; i < locsIDsInStr.length; ++i)
                     {
                         if (!locsIDsInStr[i].isEmpty())
                         {
-                            Main.Log("[SERVER]", "Adding locID "
-                                    + locsIDsInStr[i]);
+                    //        Main.Log("[SERVER]", "Adding locID "
+                   //                 + locsIDsInStr[i]);
                             nlIDs.add(Integer.parseInt(locsIDsInStr[i]));
                         }
                     }
-                    Main.Log("[SERVER]", "Gettings flags...");
+                 //   Main.Log("[SERVER]", "Gettings flags...");
                     flags = DatabaseClient
                             .commandExecute("SELECT * FROM locationFlags WHERE locationId="
                                     + locations.getInt("id"));
-                    Main.Log("[SERVER]", "Iterating flags...");
+               //     Main.Log("[SERVER]", "Iterating flags...");
                     lFlags = new Hashtable<String, LocationFlag>();
                     while (flags.next())
                     {
-                        Main.Log("[SERVER]",
-                                "Putting " + flags.getString("flag"));
+                  //      Main.Log("[SERVER]",
+                 //               "Putting " + flags.getString("flag"));
 
                         lFlags.put(flags.getString("flag"), new LocationFlag(
                                 flags.getString("val")));
 
                     }
-                    Main.Log("[SERVER]", "Putting location at hashtable...");
+                  //  Main.Log("[SERVER]", "Putting location at hashtable...");
                     locs.put(
                             locations.getInt("id"),
                             new Location(locations.getInt("id"), locations
@@ -511,7 +513,7 @@ public class Server
                 w = new World(worlds.getString("name"), locs);
                 Server.worlds.put(w.name, w);
             }
-            Main.Log("[SERVER]", "Done! Now map is:");
+         /*   Main.Log("[SERVER]", "Done! Now map is:");
             for (World w1 : Server.worlds.values())
             {
                 Main.Log("[WORLD]", w1.name);
@@ -527,7 +529,7 @@ public class Server
                         Main.Log("  [NEAR LOCATION]", nl + " ");
                     }
                 }
-            }
+            }*/
         } catch (SQLException e)
         {
             handleError(e);
@@ -553,10 +555,10 @@ public class Server
         ConnectedClient c = getClient(connection);
         if (c.controlledEntity != null)
         {
-            Main.Log("[LOGIN]", "Controlled entity is not null, saving it...");
+         //   Main.Log("[LOGIN]", "Controlled entity is not null, saving it...");
             c.controlledEntity.RemoveYourself();
-        } else
-            Main.Log("[LOGIN]", "Controlled entity is null, skipping save");
+        }// else
+           // Main.Log("[LOGIN]", "Controlled entity is null, skipping save");
 
         clients.remove(connection.getRemoteAddressUDP());
     }
@@ -565,14 +567,14 @@ public class Server
     {
         try
         {
-            Main.Log("[SERVER]", "Process auth...");
+        //    Main.Log("[SERVER]", "Process auth...");
             ResultSet l = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
                             + object.login + "' AND password='" + object.pass
                             + "'");
             if (l.next())
             {
-                Main.Log("[SERVER]", "...auth succesful!");
+              //  Main.Log("[SERVER]", "...auth succesful!");
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = true;
@@ -594,7 +596,7 @@ public class Server
                 }
             } else
             {
-                Main.Log("[SERVER]", "...auth unsuccesful(");
+             //   Main.Log("[SERVER]", "...auth unsuccesful(");
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = false;
@@ -802,7 +804,7 @@ public class Server
     {
         try
         {
-            Main.Log("[SAVE]", "Saving entity...");
+        //    Main.Log("[SAVE]", "Saving entity...");
             // Entity Main
             ResultSet entityEqRS = DatabaseClient
                     .commandExecute("SELECT * FROM entities WHERE id="
@@ -823,7 +825,7 @@ public class Server
                                 + "',"
                                 + entity.loc.id
                                 + ", '')");
-            Main.Log("[SAVE]", "Saving stats...");
+          //  Main.Log("[SAVE]", "Saving stats...");
 
             // Stats
             ResultSet statEqRS;
@@ -852,7 +854,7 @@ public class Server
                                     + s.name + "')");
 
             }
-            Main.Log("[SAVE]", "Saving skills...");
+         //   Main.Log("[SAVE]", "Saving skills...");
 
             // Skills
             ResultSet skillsEqRS;
@@ -886,7 +888,7 @@ public class Server
                                     + "','"
                                     + s.secondaryStat + "')");
             }
-            Main.Log("[SAVE]", "Saving inventory...");
+          //  Main.Log("[SAVE]", "Saving inventory...");
 
             // Inventory
             Inventory inv = inventories.get(entity.id);
@@ -985,8 +987,8 @@ public class Server
 
     public static void SaveItem(Item item)
     {
-        Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId="
-                + item.entityId + " id=" + item.id + " amount" + item.amount);
+       // Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId="
+       //         + item.entityId + " id=" + item.id + " amount" + item.amount);
         ResultSet itemEqRS = DatabaseClient
                 .commandExecute("SELECT * FROM items WHERE entityId="
                         + item.entityId + " AND id=" + item.id);
@@ -1084,6 +1086,8 @@ public class Server
         sks.put("Mining", new Skill("Mining", 0, 50, 5, "Strength", "Int"));
         sks.put("Taming", new Skill("Taming", 0, 50, 5, "Int", "Strength"));
         sks.put("Necromancy", new Skill("Necromancy", 0, 50, 5, "Int", "Int"));
+        sks.put("Parrying", new Skill("Parrying", 0, 50, 5, "Dexterity", "Strength"));
+
         return sks;
     }
 
@@ -1257,7 +1261,7 @@ public class Server
 
     }
 
-    public static void EntityDead(Entity entity, Entity from)
+    public static void EntityDead(final Entity entity, Entity from)
     {
         /*
          * Handling entitys death
@@ -1270,7 +1274,18 @@ public class Server
         TravelEntity(entity, getRandomStartLocation());
 
         entity.setRebirthHitsAmount();
+        entity.invul = true;
+        entity.tryStopAttack();
+        warnEntity(entity, "==+[You cannot be hurt by anyone]+==");
 
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                entity.invul = false;
+                warnEntity(entity, "==+[You can be hurt now]+==");
+            }
+          }, (long) (entity.invulTime*1000));
     }
 
     public static void TravelEntity(Entity e, Location l)

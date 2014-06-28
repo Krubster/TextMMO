@@ -23,6 +23,7 @@ public class DatabaseClient
                             + "user=root&password=");
         } catch (SQLException ex)
         {
+            Main.Log("[DATABASE]", ex.getMessage());
             Main.Log("[ERROR]", "SQLException: " + ex.getMessage());
             Main.Log("[ERROR]", "SQLState: " + ex.getSQLState());
             Main.Log("[ERROR]", "VendorError: " + ex.getErrorCode());

@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ru.alastar.game.PlantsType;
+import ru.alastar.main.Main;
 import ru.alastar.main.net.Server;
 
 public class GardenSystem
@@ -15,8 +16,7 @@ public class GardenSystem
 
     public static void StartGrowTimer()
     {
-        ExecutorService service = Executors.newCachedThreadPool();
-        service.submit(new Runnable()
+        Main.service.execute(new Runnable()
         {
             public void run()
             {

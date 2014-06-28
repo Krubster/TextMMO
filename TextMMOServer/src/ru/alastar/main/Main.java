@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.alastar.main.net.Server;
 
@@ -15,11 +17,13 @@ public class Main
     public static File             logFile;
     public static BufferedWriter   writer = null;
     public static SimpleDateFormat dateFormat;
-
+    public static ExecutorService  service;
+    
     public static void main(String[] args)
     {
         try
         {
+            service = Executors.newCachedThreadPool();
             CreateLogFile();
             Server.startServer();
         } catch (Exception e)

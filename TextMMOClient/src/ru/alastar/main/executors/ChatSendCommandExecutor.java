@@ -21,7 +21,7 @@ public class ChatSendCommandExecutor extends CommandExecutor
         r.msg = "";
         for (String part : args)
         {
-            r.msg += part;
+            r.msg += " " + part;
         }
         Client.Send(r);
     }
