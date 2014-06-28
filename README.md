@@ -5,7 +5,7 @@ Text MMORPG, written on Java
 
 Including client and server
 
-+ Server: version 1.15.1(Stable)
++ Server: version 1.15.2(Stable)
 + Client: version 1.14.2(Stable)
 
 Dependencies:
