@@ -43,9 +43,10 @@ public class Main
     public static File                               logFile;
     public static BufferedWriter                     writer         = null;
     public static SimpleDateFormat                   dateFormat;
-    
-    public static String                             version = "1.14.2";
-    public static ArrayList<String>                  authors = new ArrayList<String>();
+
+    public static String                             version        = "1.14.3";
+    public static ArrayList<String>                  authors        = new ArrayList<String>();
+
     public static void main(String[] args)
     {
         try
@@ -111,17 +112,17 @@ public class Main
 
     private static void RegisterCommands()
     {
-      //  serverCommands.put("login", new LoginCommandExecutor());
-      //   serverCommands.put("register", new RegisterCommandExecutor());
-      //  serverCommands.put("say", new ChatSendCommandExecutor());
-      //  serverCommands.put("move", new MoveCommandExecutor());
-      //  serverCommands.put("mine", new MineExecutor());
-      //   serverCommands.put("cut", new CutExecutor());
-      //   serverCommands.put("herd", new HerdExecutor());
-      //   serverCommands.put("grow", new GrowExecutor());
-      //   serverCommands.put("cast", new CastExecutor());
-      //   serverCommands.put("attack", new AttackExecutor());
-      
+        // serverCommands.put("login", new LoginCommandExecutor());
+        // serverCommands.put("register", new RegisterCommandExecutor());
+        // serverCommands.put("say", new ChatSendCommandExecutor());
+        // serverCommands.put("move", new MoveCommandExecutor());
+        // serverCommands.put("mine", new MineExecutor());
+        // serverCommands.put("cut", new CutExecutor());
+        // serverCommands.put("herd", new HerdExecutor());
+        // serverCommands.put("grow", new GrowExecutor());
+        // serverCommands.put("cast", new CastExecutor());
+        // serverCommands.put("attack", new AttackExecutor());
+
         clientCommands.put("logout", new LogoutExecutor());
         clientCommands.put("info", new ClientInfoExecutor());
         clientCommands.put("id", new GetIdExecutor());
@@ -151,31 +152,28 @@ public class Main
                 {
                     clientCommands.get(line.split(" ")[1].toLowerCase())
                             .execute(args);
-                } else if(clientCommands.get(line.split(" ")[1]
-                        .toLowerCase()).specificMode == ClientMode.All)
+                } else if (clientCommands.get(line.split(" ")[1].toLowerCase()).specificMode == ClientMode.All)
                 {
                     clientCommands.get(line.split(" ")[1].toLowerCase())
-                    .execute(args);
-                }
-                else
+                            .execute(args);
+                } else
                 {
                     System.out.println("Cannot use this command now");
                 }
             } else
                 System.out.println("Invalid command to client");
-        } 
-        else if (line.split(" ")[0].toLowerCase().equals("server"))
+        } else if (line.split(" ")[0].toLowerCase().equals("server"))
         {
 
-                String[] args = new String[line.split(" ").length - 1];
-                for (int i = 0; i < line.split(" ").length - 1; ++i)
-                {
-                    args[i] = line.split(" ")[i + 1];
-                }
-                
-                CommandRequest r = new CommandRequest();
-                r.args = args;
-                Client.Send(r);
+            String[] args = new String[line.split(" ").length - 1];
+            for (int i = 0; i < line.split(" ").length - 1; ++i)
+            {
+                args[i] = line.split(" ")[i + 1];
+            }
+
+            CommandRequest r = new CommandRequest();
+            r.args = args;
+            Client.Send(r);
         } else
         {
             System.out.println("Invalid command");

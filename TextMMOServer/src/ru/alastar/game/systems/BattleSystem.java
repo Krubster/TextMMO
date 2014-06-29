@@ -4,8 +4,8 @@ import ru.alastar.game.Entity;
 
 public class BattleSystem
 {
-    public static int    baseDamage = 1;
-    public static float  baseSpeed  = 3F; // in seconds
+    public static int   baseDamage = 1;
+    public static float baseSpeed  = 3F; // in seconds
 
     public static int calculateDamage(Entity from, Entity to)
     {

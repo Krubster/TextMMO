@@ -1,15 +1,19 @@
 package ru.alastar.game;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ru.alastar.enums.ActionType;
 import ru.alastar.enums.EntityType;
+import ru.alastar.enums.EquipType;
 import ru.alastar.game.systems.BattleSystem;
+import ru.alastar.game.systems.GardenSystem;
 import ru.alastar.game.systems.MagicSystem;
 import ru.alastar.game.systems.SkillsSystem;
 import ru.alastar.game.worldwide.Location;
+import ru.alastar.main.Main;
 import ru.alastar.main.net.Server;
 
 public class Entity extends Transform
@@ -22,12 +26,12 @@ public class Entity extends Transform
     public Skills            skills;
     public ArrayList<String> knownSpells;
 
-    public boolean           invul = false;
-    public float             invulTime = 15; // in seconds
+    public boolean           invul     = false;
+    public float             invulTime = 15;              // in seconds
     public static int        startHits = 15;
     public Timer             battleTimer;
     public Entity            target;
-    
+
     public Entity(int i, String c, EntityType t, Location l, Skills sk,
             Stats st, ArrayList<String> k)
     {
@@ -52,11 +56,6 @@ public class Entity extends Transform
     public void tryCut()
     {
 
-        // for(String s: loc.flags.keySet())
-        // {
-        // Main.Log("[Location Flags]", s);
-        // / }
-
         if (loc.haveFlag("Wood"))
         {
             Item woodcutter = Server.checkInventory(this, ActionType.Cut);
@@ -68,8 +67,8 @@ public class Entity extends Transform
                 {
                     Server.DestroyItem(Server.getInventory(this), woodcutter);
                 }
-                if (SkillsSystem.getChanceFromSkill(this,
-                        skills.get("Lumberjacking")) > Server.random
+                if (SkillsSystem
+                        .getChanceFromSkill(skills.get("Lumberjacking")) > Server.random
                         .nextFloat())
                 {
                     loc.getRandomMaterial(this, skills.get("Lumberjacking"),
@@ -92,20 +91,44 @@ public class Entity extends Transform
         }
     }
 
-    public void tryGrow()
+    public void tryGrow(String seed)
     {
+        // Main.Log("[DEBUG]", "Grow action! Seed: " + seed);
         if (loc.haveFlag("Plough"))
         {
-
-        }
+            if (GardenSystem.getGrowsFromLoc(loc) == null)
+            {
+                Date d = new Date();
+                d.setTime((long) (d.getTime() + Server.getPlantGrowTime(seed)));
+                GardenSystem.addGrowingPlant(new PlantsType(seed, d, this.loc));
+                Server.consumeItem(this, seed);
+                Server.warnEntity(this, "Plant begin to grow. It will grow on "
+                        + d.toString());
+                SkillsSystem.tryRaiseSkill(this, this.skills.get("Herding"));
+            } else
+                Server.warnEntity(this, "There's already growing plants!");
+        } else
+            Server.warnEntity(this, "There's no plough in this location!");
     }
 
     public void tryHerd()
     {
         if (loc.haveFlag("Plants"))
         {
+            Item item = new Item(Server.getFreeItemId(), id,
+                    this.loc.getFlag("Plants").value, Server.random.nextInt(2)
+                            + 1
+                            + SkillsSystem.getSkillBonus(this.skills
+                                    .get("Herding")), this.loc, EquipType.None,
+                    ActionType.None, new Attributes());
+            Inventory inv = Server.getInventory(this);
+            if (inv != null)
+                inv.AddItem(item);
+            this.loc.removeFlag("Plants");
+            SkillsSystem.tryRaiseSkill(this, this.skills.get("Herding"));
 
-        }
+        } else
+            Server.warnEntity(this, "There's no plants in this location!");
     }
 
     public void tryMine()
@@ -121,7 +144,7 @@ public class Entity extends Transform
                 {
                     Server.DestroyItem(Server.getInventory(this), pickaxe);
                 }
-                if (SkillsSystem.getChanceFromSkill(this, skills.get("Mining")) > Server.random
+                if (SkillsSystem.getChanceFromSkill(skills.get("Mining")) > Server.random
                         .nextFloat())
                 {
                     loc.getRandomMaterial(this, skills.get("Mining"),
@@ -189,49 +212,54 @@ public class Entity extends Transform
     {
         if (e != null)
         {
-            if(SkillsSystem.getChanceFromSkill(this, this.skills.vals.get("Swords")) > Server.random.nextFloat()){
-            e.dealDamage(this, BattleSystem.calculateDamage(this, e));
-            Server.warnEntity(this, "You trying to hit " + e.caption + "...");
-            SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Swords"));
-            }
-            else
+            if (SkillsSystem.getChanceFromSkill(this.skills.vals.get("Swords")) > Server.random
+                    .nextFloat())
+            {
+                e.dealDamage(this, BattleSystem.calculateDamage(this, e));
+                Server.warnEntity(this, "You trying to hit " + e.caption
+                        + "...");
+                SkillsSystem
+                        .tryRaiseSkill(this, this.skills.vals.get("Swords"));
+            } else
             {
                 Server.warnEntity(this, "You miss!");
-                SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Swords"));
+                SkillsSystem
+                        .tryRaiseSkill(this, this.skills.vals.get("Swords"));
             }
         }
     }
 
     private void dealDamage(Entity entity, int calculateDamage)
     {
-        if(SkillsSystem.getChanceFromSkill(this, this.skills.vals.get("Parrying")) > Server.random.nextFloat()){
-            Server.warnEntity(
-                    this,     
-                    "You successfully parried " + entity.caption + "'s attack!");
+        if (SkillsSystem.getChanceFromSkill(this.skills.vals.get("Parrying")) > Server.random
+                .nextFloat())
+        {
+            Server.warnEntity(this, "You successfully parried "
+                    + entity.caption + "'s attack!");
             SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Parrying"));
             startAttack(entity.id);
 
-        }
-        else
-        {
-        int curHits = this.stats.get("Hits").value;
-        if ((curHits - calculateDamage) > 0)
-        {
-            this.stats.set("Hits", curHits - calculateDamage, this, true);
-            Server.warnEntity(
-                    this,
-                    entity.caption + " the " + entity.type.name()
-                            + " hit you! Your hits now is: "
-                            + this.stats.get("Hits").value);
-            SkillsSystem.tryRaiseSkill(this, this.skills.vals.get("Parrying"));
-            
-            if(target == null)
-             startAttack(entity.id);
-            
         } else
         {
-            Server.EntityDead(this, entity);
-        }
+            int curHits = this.stats.get("Hits").value;
+            if ((curHits - calculateDamage) > 0)
+            {
+                this.stats.set("Hits", curHits - calculateDamage, this, true);
+                Server.warnEntity(
+                        this,
+                        entity.caption + " the " + entity.type.name()
+                                + " hit you! Your hits now is: "
+                                + this.stats.get("Hits").value);
+                SkillsSystem.tryRaiseSkill(this,
+                        this.skills.vals.get("Parrying"));
+
+                if (target == null)
+                    startAttack(entity.id);
+
+            } else
+            {
+                Server.EntityDead(this, entity);
+            }
         }
     }
 
@@ -242,47 +270,51 @@ public class Entity extends Transform
 
     public void tryStopAttack()
     {
-        if(battleTimer != null)
-        battleTimer.cancel();  
+        if (battleTimer != null)
+            battleTimer.cancel();
     }
-    
+
     public void startAttack(final int id2)
     {
-       // System.out.println("Start Attack. Weapon speed: " + (long)BattleSystem.getWeaponSpeed(this)*1000);
-        if(battleTimer != null)
-        battleTimer.cancel();
-        
+        // System.out.println("Start Attack. Weapon speed: " +
+        // (long)BattleSystem.getWeaponSpeed(this)*1000);
+        if (battleTimer != null)
+            battleTimer.cancel();
+
         battleTimer = new Timer();
-        battleTimer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                      //  System.out.println("Attack run");
-                        if (loc.getEntityById(id2) != null)
+        battleTimer.scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                // System.out.println("Attack run");
+                if (loc.getEntityById(id2) != null)
+                {
+                    target = loc.getEntityById(id2);
+                    if (target.stats.get("Hits").value > 0)
+                    {
+                        if (!target.invul)
                         {
-                            target = loc.getEntityById(id2);
-                            if (target.stats.get("Hits").value > 0)
-                            {
-                                if(!target.invul){
-                              //      System.out.println("hit it");
-                                tryAttack(target);
-                                }
-                                else{
-                                    target = null;
-                                    battleTimer.cancel();
-                                    }
-                            } else{
-                                target = null;
-                                battleTimer.cancel();
-                                }
-                        }
-                        else
+                            // System.out.println("hit it");
+                            tryAttack(target);
+                        } else
                         {
-                          //  System.out.println("entity null");
                             target = null;
                             battleTimer.cancel();
                         }
+                    } else
+                    {
+                        target = null;
+                        battleTimer.cancel();
                     }
-                  }, 0, (long)BattleSystem.getWeaponSpeed(this)*1000);
+                } else
+                {
+                    // System.out.println("entity null");
+                    target = null;
+                    battleTimer.cancel();
+                }
+            }
+        }, 0, (long) BattleSystem.getWeaponSpeed(this) * 1000);
     }
 
 }

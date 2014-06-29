@@ -15,24 +15,24 @@ import ru.alastar.main.net.Server;
 public class Main
 {
 
-    public static File             logFile;
-    public static BufferedWriter   writer = null;
-    public static SimpleDateFormat dateFormat;
-    public static ExecutorService  service;
-    public static String           version = "1.15.2";
-    public static ArrayList<String>authors = new ArrayList<String>();
-    
+    public static File              logFile;
+    public static BufferedWriter    writer  = null;
+    public static SimpleDateFormat  dateFormat;
+    public static ExecutorService   service;
+    public static String            version = "1.15.6";
+    public static ArrayList<String> authors = new ArrayList<String>();
+
     public static void main(String[] args)
     {
         try
         {
-            service = Executors.newCachedThreadPool(); 
+            service = Executors.newCachedThreadPool();
             CreateLogFile();
             authors.add("Old Man(Alex) - idea creator");
             authors.add("Alastar(Michael Gess) - programmer");
             Log("[SERVER]", "Game server version " + version + " starting");
             Log("[SERVER]", "Dont forget to give thanks to the authors: ");
-            for(String s: Main.authors)
+            for (String s : Main.authors)
             {
                 Log("[AUTHOR]", s);
             }

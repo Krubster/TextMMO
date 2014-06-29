@@ -37,23 +37,23 @@ public class CommandsCommandExecutor extends CommandExecutor
                 }
                 System.out.println("----------------");
 
-             //   System.out.println("");
+                // System.out.println("");
 
                 System.out.println("----------------");
-//
-              //  System.out.println("SERVER COMMANDS:");
-             //   System.out.println("----------------");
-             //   System.out.println("-----0");
+                //
+                // System.out.println("SERVER COMMANDS:");
+                // System.out.println("----------------");
+                // System.out.println("-----0");
 
-              //  for (String scen : Main.serverCommands.keySet())
-              //  {
-               //     str = "Name: " + scen + " Description: "
-              //              + Main.serverCommands.get(scen).description;
-              //      System.out.println(str);
-              //      System.out.println("-----0");
+                // for (String scen : Main.serverCommands.keySet())
+                // {
+                // str = "Name: " + scen + " Description: "
+                // + Main.serverCommands.get(scen).description;
+                // System.out.println(str);
+                // System.out.println("-----0");
 
-              //  }
-            //    System.out.println("----------------");
+                // }
+                // System.out.println("----------------");
             } else
             {
                 System.out.println(this.description);

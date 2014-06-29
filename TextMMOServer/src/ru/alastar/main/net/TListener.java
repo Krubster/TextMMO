@@ -21,6 +21,7 @@ import ru.alastar.main.net.responses.LoginResponse;
 import ru.alastar.main.net.responses.MessageResponse;
 import ru.alastar.main.net.responses.RegisterResponse;
 import ru.alastar.main.net.responses.RemoveEntityResponse;
+import ru.alastar.main.net.responses.RemoveFlagResponse;
 import ru.alastar.main.net.responses.RemoveFromInventoryResponse;
 import ru.alastar.main.net.responses.SetData;
 
@@ -68,6 +69,7 @@ public class TListener extends Listener
         kryo.register(RemoveFromInventoryResponse.class);
         kryo.register(AddFlagResponse.class);
         kryo.register(CommandRequest.class);
+        kryo.register(RemoveFlagResponse.class);
 
         // Main.Log("[LISTENER]", "All packets registered!");
     }
@@ -86,7 +88,7 @@ public class TListener extends Listener
                     if (object instanceof CommandRequest)
                     {
                         Server.HandleCommand(((CommandRequest) object),
-                            connection);
+                                connection);
                     }
                 }
                 c.lastPacket = new Date();

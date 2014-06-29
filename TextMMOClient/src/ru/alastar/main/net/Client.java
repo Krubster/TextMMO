@@ -24,8 +24,6 @@ public class Client
     public static Hashtable<String, Skill>            skills    = new Hashtable<String, Skill>();
     public static Hashtable<String, Statistic>        stats     = new Hashtable<String, Statistic>();
 
-
-
     public static void startClient()
     {
         client = new com.esotericsoftware.kryonet.Client();
@@ -49,14 +47,11 @@ public class Client
         }
     }
 
-  /*  public static void DoLogin()
-    {
-        System.out.println("Logging in...");
-        LoginRequest r = new LoginRequest();
-        r.login = login;
-        r.pass = password;
-        Send(r);
-    }*/
+    /*
+     * public static void DoLogin() { System.out.println("Logging in...");
+     * LoginRequest r = new LoginRequest(); r.login = login; r.pass = password;
+     * Send(r); }
+     */
 
     public static void Send(Object o)
     {

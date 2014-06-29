@@ -11,7 +11,8 @@ import ru.alastar.game.worldwide.Location;
 public class Goblin extends Entity
 {
 
-    public Goblin(int i, String c, EntityType t, Location l, Skills sk, Stats st, ArrayList<String> s)
+    public Goblin(int i, String c, EntityType t, Location l, Skills sk,
+            Stats st, ArrayList<String> s)
     {
         super(i, c, t, l, sk, st, s);
 

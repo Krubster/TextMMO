@@ -41,7 +41,8 @@ public class Inventory implements IContainer
                     r.amount = i.amount;
                     r.captiion = i.caption;
                     r.id = i.id;
-                    Server.SendTo(Server.getClientByEntity(Server.getEntity(entityId)).connection, r);
+                    Server.SendTo(Server.getClientByEntity(Server
+                            .getEntity(entityId)).connection, r);
                 } else
                 {
                     Server.warnEntity(Server.getEntity(entityId),
@@ -151,6 +152,7 @@ public class Inventory implements IContainer
                 return it;
             }
         }
-        return null;    }
+        return null;
+    }
 
 }

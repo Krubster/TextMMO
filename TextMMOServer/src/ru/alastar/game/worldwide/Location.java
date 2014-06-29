@@ -11,10 +11,12 @@ import ru.alastar.game.Inventory;
 import ru.alastar.game.Item;
 import ru.alastar.game.Skill;
 import ru.alastar.main.Main;
+import ru.alastar.main.net.ConnectedClient;
 import ru.alastar.main.net.Server;
 import ru.alastar.main.net.responses.AddEntityResponse;
 import ru.alastar.main.net.responses.ChatSendResponse;
 import ru.alastar.main.net.responses.RemoveEntityResponse;
+import ru.alastar.main.net.responses.RemoveFlagResponse;
 
 public class Location
 {
@@ -36,12 +38,11 @@ public class Location
         this.flags = new Hashtable<String, LocationFlag>();
         this.nearLocationsIDs = nlIDs;
         this.flags = flags;
-       /* Main.Log("[SERVER]", "Near Locations IDs(" + nearLocationsIDs.size()
-                + ") in " + name + " is - ");
-        for (int i1 : nearLocationsIDs)
-        {
-            System.out.println(i1);
-        }*/
+        /*
+         * Main.Log("[SERVER]", "Near Locations IDs(" + nearLocationsIDs.size()
+         * + ") in " + name + " is - "); for (int i1 : nearLocationsIDs) {
+         * System.out.println(i1); }
+         */
     }
 
     public Entity getEntityById(int i)
@@ -117,6 +118,30 @@ public class Location
     public void addFlag(String string, LocationFlag f)
     {
         flags.put(string, f);
+        Server.saveFlag(this.id, string, f);
+    }
+
+    public void removeFlag(String string)
+    {
+        try
+        {
+            flags.remove(string);
+            Server.DestroyFlag(this.id, string);
+            ConnectedClient c;
+            RemoveFlagResponse r = new RemoveFlagResponse();
+            r.flag = string;
+            for(Entity e: entities.values())
+            {
+                c = Server.getClientByEntity(e);
+                if(c != null)
+                {
+                    Server.SendTo(c.connection, r);
+                }
+            }
+        } catch (Exception e)
+        {
+            Server.handleError(e);
+        }
     }
 
     public void getRandomMaterial(Entity entity, Skill skill,
@@ -140,7 +165,18 @@ public class Location
         Inventory inv = Server.getInventory(entity);
         if (inv != null)
             inv.AddItem(item);
-        ;
+    }
+
+    public LocationFlag getFlag(String string)
+    {
+        try
+        {
+            return flags.get(string);
+        } catch (Exception e0)
+        {
+            Server.handleError(e0);
+            return null;
+        }
     }
 
 }

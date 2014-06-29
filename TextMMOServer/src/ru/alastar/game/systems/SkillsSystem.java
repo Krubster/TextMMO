@@ -7,10 +7,10 @@ import ru.alastar.main.net.Server;
 public class SkillsSystem
 {
 
-    public static float getChanceFromSkill(Entity e, Skill s)
+    public static float getChanceFromSkill(Skill s)
     {
         float c = 0.15F;
-        
+
         if (s.value > 0)
             c += s.value / 100;
 
@@ -35,11 +35,19 @@ public class SkillsSystem
     public static int getSpellStrength(String string, Entity caster)
     {
         int s = 1;
-        
-        if( caster.skills.get(string).value > 0)
-        s += caster.skills.get(string).value / caster.skills.get(string).maxValue * 10;
-        
+
+        if (caster.skills.get(string).value > 0)
+            s += caster.skills.get(string).value
+                    / caster.skills.get(string).maxValue * 10;
+
         return s;
+    }
+
+    public static int getSkillBonus(Skill skill)
+    {
+        int b = 1;
+        b += skill.value / 10;
+        return b;
     }
 
 }

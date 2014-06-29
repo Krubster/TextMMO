@@ -23,11 +23,12 @@ public class ClientInfoExecutor extends CommandExecutor
             System.out.println("[TextMMO Client");
             System.out.println("[Client Version: " + Main.version);
             System.out.println("[Authors: ");
-            for(String s: Main.authors)
+            for (String s : Main.authors)
             {
                 System.out.println(" - " + s);
             }
-            System.out.println("[Copyright: 2014 - " + Calendar.getInstance().get(Calendar.YEAR) + " (c)");
+            System.out.println("[Copyright: 2014 - "
+                    + Calendar.getInstance().get(Calendar.YEAR) + " (c)");
 
         } catch (Exception e)
         {

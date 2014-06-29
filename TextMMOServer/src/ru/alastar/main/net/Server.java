@@ -58,7 +58,8 @@ public class Server
     public static Hashtable<String, World>                      worlds;
     public static Hashtable<Integer, Inventory>                 inventories;
     public static Hashtable<Integer, Entity>                    entities;
-    public static Hashtable<String, Handler>                     commands;
+    public static Hashtable<String, Handler>                    commands;
+    public static Hashtable<String, Float>                      plantsGrowTime;
 
     public static Random                                        random;
 
@@ -87,6 +88,7 @@ public class Server
             inventories = new Hashtable<Integer, Inventory>();
             entities = new Hashtable<Integer, Entity>();
             commands = new Hashtable<String, Handler>();
+            plantsGrowTime = new Hashtable<String, Float>();
 
             DatabaseClient.Start();
             LoadWorlds();
@@ -98,7 +100,7 @@ public class Server
             FillMiningItems();
             SetupSpells();
             FillCommands();
-
+            FillPlants();
         } catch (InstantiationException e)
         {
             Main.Log("[ERROR]", e.getLocalizedMessage());
@@ -170,6 +172,11 @@ public class Server
         }
     }
 
+    private static void FillPlants()
+    {
+        plantsGrowTime.put("wheat", (float) (24 * 60 * 60 * 1000));
+    }
+
     private static void FillCommands()
     {
         registerCommand("login", new LoginHandler());
@@ -185,14 +192,15 @@ public class Server
 
     public static void registerCommand(String key, Handler h)
     {
-        try{
+        try
+        {
             commands.put(key, h);
-        }catch(Exception e)
+        } catch (Exception e)
         {
             handleError(e);
         }
     }
-    
+
     private static void SetupSpells()
     {
         MagicSystem.addSpell("heal", new Heal());
@@ -219,7 +227,6 @@ public class Server
         Location.miningItems.put(50, "valor ore");
         Location.miningItems.put(50, "diamond");
         Location.miningItems.put(50, "swiftstone");
-
     }
 
     private static void LoadPlants()
@@ -243,26 +250,33 @@ public class Server
 
     public static void SavePlant(PlantsType p)
     {
+        // Main.Log("[DEBUG]","save plant grow");
+
         ResultSet plantsRs = DatabaseClient
                 .commandExecute("SELECT * FROM plants WHERE locationId="
                         + p.loc.id);
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss");
+
+        String time = sdf.format(p.finish);
         try
         {
             if (plantsRs.next())
             {
-                DatabaseClient.commandExecute("UPDATE plants SET name="
-                        + p.plantName + ", growTime=" + p.finish
-                        + " WHERE locationId=" + p.loc.id);
+                DatabaseClient.commandExecute("UPDATE plants SET name='"
+                        + p.plantName + "', growTime='" + time
+                        + "' WHERE locationId=" + p.loc.id);
 
             } else
             {
                 DatabaseClient
                         .commandExecute("INSERT INTO plants(name, growTime, locationId) VALUES('"
                                 + p.plantName
+                                + "','"
+                                + time
                                 + "',"
-                                + p.finish
-                                + ","
-                                + p.loc.id + ")");
+                                + p.loc.id
+                                + ");");
             }
         } catch (SQLException e)
         {
@@ -359,10 +373,9 @@ public class Server
                     stats = new Stats();
 
                     skills = new Skills();
-                    
+
                     knownSpells = new ArrayList<String>();
-                    
-                    
+
                     skillsRS = DatabaseClient
                             .commandExecute("SELECT * FROM skills WHERE entityId="
                                     + allEntities.getInt("id"));
@@ -393,12 +406,12 @@ public class Server
                                                 .getInt("mValue"), statsRS
                                                 .getFloat("hardness")));
                     }
-                    
-                    while(spellsRS.next())
+
+                    while (spellsRS.next())
                     {
                         knownSpells.add(spellsRS.getString("spellName"));
                     }
-                    
+
                     e = new Entity(allEntities.getInt("id"),
                             allEntities.getString("caption"),
                             EntityType.valueOf(allEntities.getString("type")),
@@ -442,7 +455,7 @@ public class Server
         }
     }
 
-    private static void saveFlag(int id, String s, LocationFlag e)
+    public static void saveFlag(int id, String s, LocationFlag e)
     {
         ResultSet plantsRs = DatabaseClient
                 .commandExecute("SELECT * FROM locationflags WHERE locationId="
@@ -459,7 +472,7 @@ public class Server
             {
                 DatabaseClient
                         .commandExecute("INSERT INTO locationflags(locationId, flag, val) VALUES("
-                                + id + ",'" + s + "'," + e.value + ")");
+                                + id + ",'" + s + "','" + e.value + "')");
             }
         } catch (SQLException e1)
         {
@@ -493,38 +506,38 @@ public class Server
                         "Loading world " + worlds.getString("name") + "...");
                 while (locations.next())
                 {
-                 //   Main.Log("[SERVER]", "Clearing nlIDs...");
+                    // Main.Log("[SERVER]", "Clearing nlIDs...");
                     nlIDs = new ArrayList<Integer>();
-                  //  Main.Log("[SERVER]",
-                 //           "Getting IDs string and splitting it...");
+                    // Main.Log("[SERVER]",
+                    // "Getting IDs string and splitting it...");
                     locsIDsInStr = locations.getString("nearLocationsIDs")
                             .split(";");
-                 //   Main.Log("[SERVER]", "Iterating this string...");
+                    // Main.Log("[SERVER]", "Iterating this string...");
                     for (int i = 0; i < locsIDsInStr.length; ++i)
                     {
                         if (!locsIDsInStr[i].isEmpty())
                         {
-                    //        Main.Log("[SERVER]", "Adding locID "
-                   //                 + locsIDsInStr[i]);
+                            // Main.Log("[SERVER]", "Adding locID "
+                            // + locsIDsInStr[i]);
                             nlIDs.add(Integer.parseInt(locsIDsInStr[i]));
                         }
                     }
-                 //   Main.Log("[SERVER]", "Gettings flags...");
+                    // Main.Log("[SERVER]", "Gettings flags...");
                     flags = DatabaseClient
                             .commandExecute("SELECT * FROM locationFlags WHERE locationId="
                                     + locations.getInt("id"));
-               //     Main.Log("[SERVER]", "Iterating flags...");
+                    // Main.Log("[SERVER]", "Iterating flags...");
                     lFlags = new Hashtable<String, LocationFlag>();
                     while (flags.next())
                     {
-                  //      Main.Log("[SERVER]",
-                 //               "Putting " + flags.getString("flag"));
+                        // Main.Log("[SERVER]",
+                        // "Putting " + flags.getString("flag"));
 
                         lFlags.put(flags.getString("flag"), new LocationFlag(
                                 flags.getString("val")));
 
                     }
-                  //  Main.Log("[SERVER]", "Putting location at hashtable...");
+                    // Main.Log("[SERVER]", "Putting location at hashtable...");
                     locs.put(
                             locations.getInt("id"),
                             new Location(locations.getInt("id"), locations
@@ -535,23 +548,14 @@ public class Server
                 w = new World(worlds.getString("name"), locs);
                 Server.worlds.put(w.name, w);
             }
-         /*   Main.Log("[SERVER]", "Done! Now map is:");
-            for (World w1 : Server.worlds.values())
-            {
-                Main.Log("[WORLD]", w1.name);
-                for (Location l1 : w1.locations.values())
-                {
-                    Main.Log(" [LOCATION]", l1.id + " - " + l1.name);
-                    for (String f : l1.flags.keySet())
-                    {
-                        Main.Log(" -[FLAG]", f);
-                    }
-                    for (int nl : l1.nearLocationsIDs)
-                    {
-                        Main.Log("  [NEAR LOCATION]", nl + " ");
-                    }
-                }
-            }*/
+            /*
+             * Main.Log("[SERVER]", "Done! Now map is:"); for (World w1 :
+             * Server.worlds.values()) { Main.Log("[WORLD]", w1.name); for
+             * (Location l1 : w1.locations.values()) { Main.Log(" [LOCATION]",
+             * l1.id + " - " + l1.name); for (String f : l1.flags.keySet()) {
+             * Main.Log(" -[FLAG]", f); } for (int nl : l1.nearLocationsIDs) {
+             * Main.Log("  [NEAR LOCATION]", nl + " "); } } }
+             */
         } catch (SQLException e)
         {
             handleError(e);
@@ -577,10 +581,11 @@ public class Server
         ConnectedClient c = getClient(connection);
         if (c.controlledEntity != null)
         {
-         //   Main.Log("[LOGIN]", "Controlled entity is not null, saving it...");
+            // Main.Log("[LOGIN]",
+            // "Controlled entity is not null, saving it...");
             c.controlledEntity.RemoveYourself();
         }// else
-           // Main.Log("[LOGIN]", "Controlled entity is null, skipping save");
+         // Main.Log("[LOGIN]", "Controlled entity is null, skipping save");
 
         clients.remove(connection.getRemoteAddressUDP());
     }
@@ -589,14 +594,13 @@ public class Server
     {
         try
         {
-        //    Main.Log("[SERVER]", "Process auth...");
+            // Main.Log("[SERVER]", "Process auth...");
             ResultSet l = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + login + "' AND password='" + pass
-                            + "'");
+                            + login + "' AND password='" + pass + "'");
             if (l.next())
             {
-              //  Main.Log("[SERVER]", "...auth succesful!");
+                // Main.Log("[SERVER]", "...auth succesful!");
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = true;
@@ -618,7 +622,7 @@ public class Server
                 }
             } else
             {
-             //   Main.Log("[SERVER]", "...auth unsuccesful(");
+                // Main.Log("[SERVER]", "...auth unsuccesful(");
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = false;
@@ -645,8 +649,7 @@ public class Server
                 Stats stats = new Stats();
                 Skills skills = new Skills();
                 ArrayList<String> knownSpells = new ArrayList<String>();
-                
-                
+
                 ResultSet skillsRS = DatabaseClient
                         .commandExecute("SELECT * FROM skills WHERE entityId="
                                 + e.getInt("id"));
@@ -679,15 +682,16 @@ public class Server
                                             .getFloat("hardness")));
                 }
 
-                while(spellsRS.next())
+                while (spellsRS.next())
                 {
                     knownSpells.add(spellsRS.getString("spellName"));
                 }
-                
+
                 Entity entity = new Entity(e.getInt("id"),
                         e.getString("caption"), EntityType.valueOf(e
                                 .getString("type")),
-                        getLocation(e.getInt("locationId")), skills, stats, knownSpells);
+                        getLocation(e.getInt("locationId")), skills, stats,
+                        knownSpells);
                 // Main.Log("[SERVER]",
                 // "Assigning it as a controlled to the connected client...");
                 c.controlledEntity = entity;
@@ -767,10 +771,12 @@ public class Server
 
     public static void warnEntity(Entity e, String m)
     {
-        try{
-        MessageResponse r = new MessageResponse();
-        r.msg = m;
-        SendTo(getClientByEntity(e).connection, r);}catch(Exception er)
+        try
+        {
+            MessageResponse r = new MessageResponse();
+            r.msg = m;
+            SendTo(getClientByEntity(e).connection, r);
+        } catch (Exception er)
         {
             handleError(er);
         }
@@ -830,7 +836,7 @@ public class Server
     {
         try
         {
-        //    Main.Log("[SAVE]", "Saving entity...");
+            // Main.Log("[SAVE]", "Saving entity...");
             // Entity Main
             ResultSet entityEqRS = DatabaseClient
                     .commandExecute("SELECT * FROM entities WHERE id="
@@ -851,7 +857,7 @@ public class Server
                                 + "',"
                                 + entity.loc.id
                                 + ", '')");
-          //  Main.Log("[SAVE]", "Saving stats...");
+            // Main.Log("[SAVE]", "Saving stats...");
 
             // Stats
             ResultSet statEqRS;
@@ -880,7 +886,7 @@ public class Server
                                     + s.name + "')");
 
             }
-         //   Main.Log("[SAVE]", "Saving skills...");
+            // Main.Log("[SAVE]", "Saving skills...");
 
             // Skills
             ResultSet skillsEqRS;
@@ -914,7 +920,7 @@ public class Server
                                     + "','"
                                     + s.secondaryStat + "')");
             }
-          //  Main.Log("[SAVE]", "Saving inventory...");
+            // Main.Log("[SAVE]", "Saving inventory...");
 
             // Inventory
             Inventory inv = inventories.get(entity.id);
@@ -922,22 +928,21 @@ public class Server
             {
                 saveInventory(inv);
             }
-            
+
         } catch (SQLException e)
         {
             handleError(e);
         }
     }
 
-    public static void ProcessRegister(String login, String pass, String mail, String name, String race,
-            Connection connection)
+    public static void ProcessRegister(String login, String pass, String mail,
+            String name, String race, Connection connection)
     {
         try
         {
             ResultSet regRS = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + login + "' AND mail='"
-                            + mail + "'");
+                            + login + "' AND mail='" + mail + "'");
             RegisterResponse r = new RegisterResponse();
 
             if (regRS.next())
@@ -946,7 +951,8 @@ public class Server
                 Server.SendTo(connection, r);
             } else
             {
-                CreateAccount(login, pass, mail, name, race, getClient(connection));
+                CreateAccount(login, pass, mail, name, race,
+                        getClient(connection));
                 r.successful = true;
                 Server.SendTo(connection, r);
             }
@@ -956,24 +962,31 @@ public class Server
         }
     }
 
-    private static void CreateAccount(String login, String pass, String mail, String name, String race, ConnectedClient client)
+    private static void CreateAccount(String login, String pass, String mail,
+            String name, String race, ConnectedClient client)
     {
-        try{
-        Entity e = new Entity(getFreeId(), name,
-                EntityType.valueOf(race), Server.getRandomStartLocation(),
-                Server.getStandardSkillsSet(), Server.getStandardStatsSet(), new ArrayList<String>());
-        client.controlledEntity = e;
-        entities.put(e.id, e);
-        createInventory(e.id);
-        saveInventory(inventories.get(e.id));
-        saveEntity(e);
-        DatabaseClient
-                .commandExecute("INSERT INTO accounts(login, password, mail, entityId) VALUES('"
-                        + login
-                        + "','"
-                        + pass
-                        + "','" + mail + "'," + e.id + ")");
-        }catch(Exception e)
+        try
+        {
+            Entity e = new Entity(getFreeId(), name, EntityType.valueOf(race),
+                    Server.getRandomStartLocation(),
+                    Server.getStandardSkillsSet(),
+                    Server.getStandardStatsSet(), new ArrayList<String>());
+            client.controlledEntity = e;
+            entities.put(e.id, e);
+            createInventory(e.id);
+            saveInventory(inventories.get(e.id));
+            saveEntity(e);
+            DatabaseClient
+                    .commandExecute("INSERT INTO accounts(login, password, mail, entityId) VALUES('"
+                            + login
+                            + "','"
+                            + pass
+                            + "','"
+                            + mail
+                            + "',"
+                            + e.id
+                            + ")");
+        } catch (Exception e)
         {
             handleError(e);
         }
@@ -1018,8 +1031,8 @@ public class Server
 
     public static void SaveItem(Item item)
     {
-       // Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId="
-       //         + item.entityId + " id=" + item.id + " amount" + item.amount);
+        // Main.Log("[SAVE ITEM]", "Saving item " + item.caption + " entityId="
+        // + item.entityId + " id=" + item.id + " amount" + item.amount);
         ResultSet itemEqRS = DatabaseClient
                 .commandExecute("SELECT * FROM items WHERE entityId="
                         + item.entityId + " AND id=" + item.id);
@@ -1117,7 +1130,9 @@ public class Server
         sks.put("Mining", new Skill("Mining", 0, 50, 5, "Strength", "Int"));
         sks.put("Taming", new Skill("Taming", 0, 50, 5, "Int", "Strength"));
         sks.put("Necromancy", new Skill("Necromancy", 0, 50, 5, "Int", "Int"));
-        sks.put("Parrying", new Skill("Parrying", 0, 50, 5, "Dexterity", "Strength"));
+        sks.put("Parrying", new Skill("Parrying", 0, 50, 5, "Dexterity",
+                "Strength"));
+        sks.put("Herding", new Skill("Herding", 0, 50, 5, "Int", "Int"));
 
         return sks;
     }
@@ -1194,15 +1209,17 @@ public class Server
         // Main.Log("[MOVE]", "nlID: " + near);
 
         // }
-        try{
-        if (c.controlledEntity.loc.nearLocationsIDs.contains(id))
+        try
         {
-            c.controlledEntity.loc.RemoveEntity(c.controlledEntity);
-            MovePlayerAt(getLocation(id), c);
-        } else
-        {
-            Main.Log("[ERROR]", "There's no near location with that id");
-        }}catch(Exception e)
+            if (c.controlledEntity.loc.nearLocationsIDs.contains(id))
+            {
+                c.controlledEntity.loc.RemoveEntity(c.controlledEntity);
+                MovePlayerAt(getLocation(id), c);
+            } else
+            {
+                Main.Log("[ERROR]", "There's no near location with that id");
+            }
+        } catch (Exception e)
         {
             handleError(e);
         }
@@ -1238,9 +1255,10 @@ public class Server
         }
     }
 
-    public static void HandleAction(ActionType action,
-            Connection connection)
+    public static void HandleAction(ActionType action, Connection connection,
+            String[] args)
     {
+        // Main.Log("[DEBUG]", "Handling action " + action.name());
         try
         {
             ConnectedClient c = getClient(connection);
@@ -1250,7 +1268,7 @@ public class Server
                     c.controlledEntity.tryCut();
                     break;
                 case Grow:
-                    c.controlledEntity.tryGrow();
+                    c.controlledEntity.tryGrow(args[2]);
                     break;
                 case Herd:
                     c.controlledEntity.tryHerd();
@@ -1270,7 +1288,8 @@ public class Server
 
     }
 
-    public static void HandleCast(String spellName, int eId, Connection connection)
+    public static void HandleCast(String spellName, int eId,
+            Connection connection)
     {
         try
         {
@@ -1282,7 +1301,7 @@ public class Server
         }
     }
 
-    public static void HandleAttack(int id,Connection connection)
+    public static void HandleAttack(int id, Connection connection)
     {
         try
         {
@@ -1304,7 +1323,7 @@ public class Server
                 + "(" + entity.id + ") dead!");
 
         warnEntity(entity, "==+[You're dead! Next time be more careful]+==");
-        
+
         TravelEntity(entity, getRandomStartLocation());
 
         entity.setRebirthHitsAmount();
@@ -1313,13 +1332,15 @@ public class Server
         warnEntity(entity, "==+[You cannot be hurt by anyone]+==");
 
         Timer t = new Timer();
-        t.schedule(new TimerTask() {
+        t.schedule(new TimerTask()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 entity.invul = false;
                 warnEntity(entity, "==+[You can be hurt now]+==");
             }
-          }, (long) (entity.invulTime*1000));
+        }, (long) (entity.invulTime * 1000));
     }
 
     public static void TravelEntity(Entity e, Location l)
@@ -1371,15 +1392,14 @@ public class Server
     public static boolean haveItemSet(Entity e, ArrayList<String> reagentsNeeded)
     {
         Inventory i = getInventory(e);
-        if(i != null)
+        if (i != null)
         {
-            for(String s: reagentsNeeded)
+            for (String s : reagentsNeeded)
             {
-                if(haveItem(e, s))
+                if (haveItem(e, s))
                 {
                     continue;
-                }
-                else
+                } else
                 {
                     return false;
                 }
@@ -1391,11 +1411,11 @@ public class Server
     private static boolean haveItem(Entity e, String s)
     {
         Inventory i = getInventory(e);
-        if(i != null)
-        {  
-            for(Item item: i.items)
+        if (i != null)
+        {
+            for (Item item : i.items)
             {
-                if(item.caption.equals(s))
+                if (item.caption.equals(s))
                     return true;
             }
         }
@@ -1405,28 +1425,32 @@ public class Server
     public static void consumeItem(Entity entity, String s)
     {
         Inventory i = getInventory(entity);
-        if(i != null)
+        if (i != null)
         {
-           Item item = i.getItem(s);
-           if(item.amount <= 1)
-               Server.DestroyItem(i, item);
-           else
-               --item.amount;
+            Item item = i.getItem(s);
+            if (item.amount <= 1)
+                Server.DestroyItem(i, item);
+            else
+                --item.amount;
         }
     }
 
     public static void HandleCommand(CommandRequest commandRequest,
             Connection connection)
     {
-        try{
-        String commandKey = commandRequest.args[0];
-        if(Server.commands.containsKey(commandKey)){
-        Server.commands.get(commandKey).execute(commandRequest.args, connection);}
-        else
+        try
         {
-            Server.warnClient(getClient(connection), "Invalid server command");
-        }
-        }catch(Exception e)
+            String commandKey = commandRequest.args[0];
+            if (Server.commands.containsKey(commandKey))
+            {
+                Server.commands.get(commandKey).execute(commandRequest.args,
+                        connection);
+            } else
+            {
+                Server.warnClient(getClient(connection),
+                        "Invalid server command");
+            }
+        } catch (Exception e)
         {
             handleError(e);
         }
@@ -1441,13 +1465,32 @@ public class Server
 
     public static ActionType getActionFromString(String string)
     {
-        for(ActionType aT: ActionType.values())
+        for (ActionType aT : ActionType.values())
         {
-            if(aT.name().toLowerCase().contains(string))
+            if (aT.name().toLowerCase().contains(string))
             {
                 return aT;
             }
         }
         return ActionType.None;
+    }
+
+    public static float getPlantGrowTime(String seed)
+    {
+        try
+        {
+            return plantsGrowTime.get(seed);
+        } catch (Exception e)
+        {
+            handleError(e);
+            return 10;
+        }
+    }
+
+    public static void DestroyFlag(int id, String string)
+    {
+        DatabaseClient
+                .commandExecute("DELETE FROM locationflags WHERE locationId = "
+                        + id + " AND flag='" + string + "' LIMIT 1;");
     }
 }

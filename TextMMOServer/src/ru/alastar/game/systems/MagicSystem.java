@@ -9,15 +9,15 @@ public class MagicSystem
 {
 
     public static Hashtable<String, Spell> spells = new Hashtable<String, Spell>();
-    
+
     public static void addSpell(String s, Spell spell)
     {
         spells.put(s, spell);
     }
-    
+
     public static void tryCast(Entity caster, Entity target, String spellName)
     {
-        if(spells.containsKey(spellName.toLowerCase()))
+        if (spells.containsKey(spellName.toLowerCase()))
         {
             spells.get(spellName.toLowerCase()).invoke(caster, target);
         }
@@ -27,5 +27,5 @@ public class MagicSystem
     {
         return spells.get(spellname);
     }
-    
+
 }

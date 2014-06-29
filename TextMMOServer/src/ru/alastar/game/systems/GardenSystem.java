@@ -3,7 +3,9 @@ package ru.alastar.game.systems;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ru.alastar.database.DatabaseClient;
 import ru.alastar.game.PlantsType;
+import ru.alastar.game.worldwide.Location;
 import ru.alastar.main.Main;
 import ru.alastar.main.net.Server;
 
@@ -37,20 +39,29 @@ public class GardenSystem
                 {
                     if (p.finish.before(d))
                     {
-                        p.Finish();
-                        growingPlants.remove(p);
+                        FinishPlant(p);
                         notifyPlants();
                         break;
                     }
                 }
             }
 
+            private void FinishPlant(PlantsType p)
+            {
+                p.Finish();
+                growingPlants.remove(p);
+                DatabaseClient
+                        .commandExecute("DELETE FROM plants WHERE locationId="
+                                + p.loc.id + " LIMIT 1;");
+                // Main.Log("[DEBUG]","Finish plant grow");
+            }
         });
     }
 
     public static void addGrowingPlant(PlantsType p)
     {
         growingPlants.add(p);
+        Server.SavePlant(p);
     }
 
     public static void SaveAll()
@@ -59,6 +70,18 @@ public class GardenSystem
         {
             Server.SavePlant(p);
         }
+    }
+
+    public static PlantsType getGrowsFromLoc(Location l)
+    {
+        for (PlantsType p : growingPlants)
+        {
+            if (p.loc.id == l.id)
+            {
+                return p;
+            }
+        }
+        return null;
     }
 
 }
