@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: 127.0.0.1
--- Время создания: Июн 29 2014 г., 15:03
+-- Время создания: Июн 29 2014 г., 16:15
 -- Версия сервера: 5.5.25
 -- Версия PHP: 5.2.12
 
@@ -38,9 +38,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 --
 
 INSERT INTO `accounts` (`login`, `password`, `mail`, `entityId`) VALUES
-('Alastar', '1', 'some@mail.ru', 1),
-('Alastar2', '1', 'some2@mail.ru', 2),
-('Alastar3', '1', 'some@mail.ru', 3);
+('Alastar', '��B8��#�\r�P�ou��', 'some@mail.ru', 4);
 
 -- --------------------------------------------------------
 
@@ -75,16 +73,14 @@ CREATE TABLE IF NOT EXISTS `entities` (
   `locationId` int(11) NOT NULL,
   `ai` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Дамп данных таблицы `entities`
 --
 
 INSERT INTO `entities` (`id`, `caption`, `type`, `locationId`, `ai`) VALUES
-(1, 'Alastar', 'Human', 3, ''),
-(2, 'Zuzya', 'Elf', 1, ''),
-(3, 'Kenzo', 'Orc', 1, '');
+(4, 'Wookie', 'Elf', 1, '');
 
 -- --------------------------------------------------------
 
@@ -102,9 +98,7 @@ CREATE TABLE IF NOT EXISTS `inventories` (
 --
 
 INSERT INTO `inventories` (`entityId`, `max`) VALUES
-(1, 20),
-(2, 20),
-(3, 20);
+(4, 20);
 
 -- --------------------------------------------------------
 
@@ -128,15 +122,16 @@ CREATE TABLE IF NOT EXISTS `items` (
 --
 
 INSERT INTO `items` (`id`, `locationId`, `caption`, `amount`, `entityId`, `type`, `actionType`) VALUES
-(2, 1, 'Wooden pickaxe', 1, 1, 'None', 'Mine'),
-(6, 3, 'Wooden axe', 1, 1, 'None', 'Cut'),
-(7, 5, 'wheat', 4, 1, 'None', 'None'),
-(8, 5, 'emerald', 7, 1, 'None', 'None'),
-(9, 5, 'iron ore', 9, 1, 'None', 'None'),
-(10, 5, 'ginseng', 9, 1, 'None', 'None'),
-(11, 5, 'swiftstone', 3, 1, 'None', 'None'),
-(12, 5, 'copper ore', 3, 1, 'None', 'None'),
-(13, 1, 'Coin', 1, 3, 'None', 'None');
+(2, 1, 'Wooden pickaxe', 1, 4, 'None', 'Mine'),
+(6, 3, 'Wooden axe', 1, 4, 'None', 'Cut'),
+(7, 5, 'wheat', 4, 4, 'None', 'None'),
+(8, 5, 'emerald', 7, 4, 'None', 'None'),
+(9, 5, 'iron ore', 9, 4, 'None', 'None'),
+(10, 5, 'ginseng', 9, 4, 'None', 'None'),
+(11, 5, 'swiftstone', 3, 4, 'None', 'None'),
+(12, 5, 'copper ore', 3, 4, 'None', 'None'),
+(13, 1, 'Coin', 1, 4, 'None', 'None'),
+(14, 1, 'Coin', 1, 4, 'None', 'None');
 
 -- --------------------------------------------------------
 
@@ -154,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `knownspells` (
 --
 
 INSERT INTO `knownspells` (`spellName`, `entityId`) VALUES
-('heal', 1);
+('heal', 4);
 
 -- --------------------------------------------------------
 
@@ -240,27 +235,15 @@ CREATE TABLE IF NOT EXISTS `skills` (
 --
 
 INSERT INTO `skills` (`entityId`, `name`, `sValue`, `mValue`, `hardness`, `primaryStat`, `secondaryStat`) VALUES
-(1, 'Herding', 1, 50, 5, 'Int', 'Strength'),
-(1, 'Lumberjacking', 0, 50, 5, 'Strength', 'Dexterity'),
-(1, 'Chivalry', 0, 50, 5, 'Strength', 'Int'),
-(1, 'Parrying', 5, 50, 5, 'Dexterity', 'Strength'),
-(1, 'Swords', 50, 50, 5, 'Strength', 'Dexterity'),
-(1, 'Mining', 0, 50, 5, 'Strength', 'Int'),
-(1, 'Magery', 0, 50, 5, 'Int', 'Int'),
-(2, 'Herding', 0, 50, 5, 'Int', 'Strength'),
-(2, 'Lumberjacking', 0, 50, 5, 'Strength', 'Dexterity'),
-(2, 'Chivalry', 0, 50, 5, 'Strength', 'Int'),
-(2, 'Necromancy', 0, 50, 5, 'Int', 'Int'),
-(2, 'Swords', 0, 50, 5, 'Strength', 'Dexterity'),
-(2, 'Mining', 0, 50, 5, 'Strength', 'Int'),
-(2, 'Magery', 0, 50, 5, 'Int', 'Int'),
-(3, 'Herding', 0, 50, 5, 'Int', 'Strength'),
-(3, 'Lumberjacking', 0, 50, 5, 'Strength', 'Dexterity'),
-(3, 'Chivalry', 0, 50, 5, 'Strength', 'Int'),
-(3, 'Parrying', 6, 50, 5, 'Dexterity', 'Strength'),
-(3, 'Swords', 45, 50, 5, 'Strength', 'Dexterity'),
-(3, 'Mining', 0, 50, 5, 'Strength', 'Int'),
-(3, 'Magery', 0, 50, 5, 'Int', 'Int');
+(4, 'Taming', 0, 50, 5, 'Int', 'Strength'),
+(4, 'Lumberjacking', 0, 50, 5, 'Strength', 'Dexterity'),
+(4, 'Herding', 0, 50, 5, 'Int', 'Int'),
+(4, 'Swords', 0, 50, 5, 'Strength', 'Dexterity'),
+(4, 'Necromancy', 0, 50, 5, 'Int', 'Int'),
+(4, 'Magery', 0, 50, 5, 'Int', 'Int'),
+(4, 'Chivalry', 0, 50, 5, 'Strength', 'Int'),
+(4, 'Parrying', 0, 50, 5, 'Dexterity', 'Strength'),
+(4, 'Mining', 0, 50, 5, 'Strength', 'Int');
 
 -- --------------------------------------------------------
 
@@ -281,20 +264,11 @@ CREATE TABLE IF NOT EXISTS `stats` (
 --
 
 INSERT INTO `stats` (`entityId`, `sValue`, `mValue`, `name`, `hardness`) VALUES
-(1, 5, 50, 'Strength', 5),
-(1, 5, 50, 'Dexterity', 5),
-(1, 3, 50, 'Hits', 5),
-(1, 5, 50, 'Int', 5),
-(2, 5, 50, 'Strength', 5),
-(2, 5, 50, 'Dexterity', 5),
-(2, 10, 50, 'Hits', 5),
-(2, 5, 50, 'Int', 5),
-(1, 0, 20, 'Mana', 3),
-(3, 5, 50, 'Strength', 5),
-(3, 5, 50, 'Dexterity', 5),
-(3, 15, 50, 'Hits', 5),
-(3, 20, 20, 'Mana', 5),
-(3, 5, 50, 'Int', 5);
+(4, 5, 50, 'Strength', 5),
+(4, 5, 50, 'Dexterity', 5),
+(4, 10, 50, 'Hits', 5),
+(4, 20, 20, 'Mana', 5),
+(4, 5, 50, 'Int', 5);
 
 -- --------------------------------------------------------
 
