@@ -29,6 +29,7 @@ import ru.alastar.game.Skill;
 import ru.alastar.game.Skills;
 import ru.alastar.game.Statistic;
 import ru.alastar.game.Stats;
+import ru.alastar.game.security.Crypt;
 import ru.alastar.game.spells.Heal;
 import ru.alastar.game.systems.GardenSystem;
 import ru.alastar.game.systems.MagicSystem;
@@ -147,8 +148,15 @@ public class Server
                                 Main.writer.close();
                                 break;
                             }
-                        }
-                    } catch (IOException e)
+                            
+                            if ("encrypt".equals(line.split(" ")[0].toLowerCase()))
+                            {
+                                System.out.println(Crypt.encrypt(line.split(" ")[1]));
+                                continue;
+                            }
+
+                    }
+                    }catch (IOException e)
                     {
                         e.printStackTrace();
                     }
@@ -597,7 +605,7 @@ public class Server
             // Main.Log("[SERVER]", "Process auth...");
             ResultSet l = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + login + "' AND password='" + pass + "'");
+                            + login + "' AND password='" + Crypt.encrypt(pass) + "'");
             if (l.next())
             {
                 // Main.Log("[SERVER]", "...auth succesful!");
@@ -980,7 +988,7 @@ public class Server
                     .commandExecute("INSERT INTO accounts(login, password, mail, entityId) VALUES('"
                             + login
                             + "','"
-                            + pass
+                            + Crypt.encrypt(pass)
                             + "','"
                             + mail
                             + "',"
