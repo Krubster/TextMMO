@@ -21,11 +21,16 @@ public class SkillsSystem
     public static void tryRaiseSkill(Entity e, Skill s)
     {
         float h = Server.random.nextFloat();
-        if (h > s.value / 100 + 0.5)
+        float skill = 0;
+
+        if (s.value > 0)
+            skill += s.value / 10;
+
+        if (h > skill)
         {
             if (s.value + 1 <= s.maxValue)
             {
-                s.raise((int) 1);
+                s.raise((int) 1, e, true);
                 Server.warnEntity(e, "Your skill [" + s.name
                         + "] have been increased by 1, now it is " + s.value);
             }
