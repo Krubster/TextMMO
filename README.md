@@ -26,4 +26,5 @@ To Do:
 - Animals
 - Housing(?)
 - Add equip
+- Add crafts
 - Custom plugins support
