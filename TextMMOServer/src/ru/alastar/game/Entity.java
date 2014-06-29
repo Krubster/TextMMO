@@ -13,7 +13,6 @@ import ru.alastar.game.systems.GardenSystem;
 import ru.alastar.game.systems.MagicSystem;
 import ru.alastar.game.systems.SkillsSystem;
 import ru.alastar.game.worldwide.Location;
-import ru.alastar.main.Main;
 import ru.alastar.main.net.Server;
 
 public class Entity extends Transform

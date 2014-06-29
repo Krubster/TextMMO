@@ -148,15 +148,17 @@ public class Server
                                 Main.writer.close();
                                 break;
                             }
-                            
-                            if ("encrypt".equals(line.split(" ")[0].toLowerCase()))
+
+                            if ("encrypt".equals(line.split(" ")[0]
+                                    .toLowerCase()))
                             {
-                                System.out.println(Crypt.encrypt(line.split(" ")[1]));
+                                System.out.println(Crypt.encrypt(line
+                                        .split(" ")[1]));
                                 continue;
                             }
 
-                    }
-                    }catch (IOException e)
+                        }
+                    } catch (IOException e)
                     {
                         e.printStackTrace();
                     }
@@ -605,7 +607,8 @@ public class Server
             // Main.Log("[SERVER]", "Process auth...");
             ResultSet l = DatabaseClient
                     .commandExecute("SELECT * FROM accounts WHERE login='"
-                            + login + "' AND password='" + Crypt.encrypt(pass) + "'");
+                            + login + "' AND password='" + Crypt.encrypt(pass)
+                            + "'");
             if (l.next())
             {
                 // Main.Log("[SERVER]", "...auth succesful!");
@@ -990,10 +993,7 @@ public class Server
                             + "','"
                             + Crypt.encrypt(pass)
                             + "','"
-                            + mail
-                            + "',"
-                            + e.id
-                            + ")");
+                            + mail + "'," + e.id + ")");
         } catch (Exception e)
         {
             handleError(e);

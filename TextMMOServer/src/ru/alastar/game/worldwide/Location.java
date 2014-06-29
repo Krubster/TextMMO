@@ -130,10 +130,10 @@ public class Location
             ConnectedClient c;
             RemoveFlagResponse r = new RemoveFlagResponse();
             r.flag = string;
-            for(Entity e: entities.values())
+            for (Entity e : entities.values())
             {
                 c = Server.getClientByEntity(e);
-                if(c != null)
+                if (c != null)
                 {
                     Server.SendTo(c.connection, r);
                 }
