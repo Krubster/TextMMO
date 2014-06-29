@@ -155,4 +155,24 @@ public class Inventory implements IContainer
         return null;
     }
 
+    public void consume(Item item)
+    {
+        if (item.amount <= 1)
+        {
+            Server.DestroyItem(this, item);
+            RemoveFromInventoryResponse r = new RemoveFromInventoryResponse();
+            r.id = item.id;
+            Server.SendTo( Server.getClientByEntity(Server.getEntity(entityId)).connection, r);
+        } else
+        {
+            --item.amount;
+            InventoryResponse r = new InventoryResponse();
+            r.id = item.id;
+            r.amount = item.amount;
+            r.attrs = item.attributes.values;
+            r.captiion = item.caption;
+            Server.SendTo( Server.getClientByEntity(Server.getEntity(entityId)).connection, r);
+        }     
+    }
+
 }

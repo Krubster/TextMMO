@@ -21,6 +21,7 @@ import ru.alastar.enums.ActionType;
 import ru.alastar.enums.EntityType;
 import ru.alastar.enums.EquipType;
 import ru.alastar.game.Attributes;
+import ru.alastar.game.CraftInfo;
 import ru.alastar.game.Entity;
 import ru.alastar.game.Inventory;
 import ru.alastar.game.Item;
@@ -31,6 +32,7 @@ import ru.alastar.game.Statistic;
 import ru.alastar.game.Stats;
 import ru.alastar.game.security.Crypt;
 import ru.alastar.game.spells.Heal;
+import ru.alastar.game.systems.CraftSystem;
 import ru.alastar.game.systems.GardenSystem;
 import ru.alastar.game.systems.MagicSystem;
 import ru.alastar.game.worldwide.Location;
@@ -102,6 +104,7 @@ public class Server
             SetupSpells();
             FillCommands();
             FillPlants();
+            FillCrafts();
         } catch (InstantiationException e)
         {
             Main.Log("[ERROR]", e.getLocalizedMessage());
@@ -182,6 +185,21 @@ public class Server
         }
     }
 
+    private static void FillCrafts()
+    {
+        ArrayList<String> neededItems = new ArrayList<String>();
+        Attributes attrs = new Attributes();
+
+        neededItems.add("plain wood");
+        neededItems.add("amber");
+        attrs.addAttribute("Charges", 10);
+        attrs.addAttribute("Durability", 100);
+
+        CraftSystem.registerCraft("wooden_totem", new CraftInfo(neededItems,
+                "Carpentry", 0, "Wooden Totem", EquipType.None,
+                ActionType.Cast, attrs));
+    }
+
     private static void FillPlants()
     {
         plantsGrowTime.put("wheat", (float) (24 * 60 * 60 * 1000));
@@ -197,6 +215,7 @@ public class Server
         registerCommand("cast", new CastHandler());
         registerCommand("attack", new AttackHandler());
         registerCommand("help", new HelpHandler());
+        registerCommand("craft", new CraftHandler());
 
     }
 
@@ -1141,6 +1160,8 @@ public class Server
         sks.put("Parrying", new Skill("Parrying", 0, 50, 5, "Dexterity",
                 "Strength"));
         sks.put("Herding", new Skill("Herding", 0, 50, 5, "Int", "Int"));
+        sks.put("Carpentry",
+                new Skill("Carpentry", 0, 50, 5, "Int", "Strength"));
 
         return sks;
     }
@@ -1436,10 +1457,7 @@ public class Server
         if (i != null)
         {
             Item item = i.getItem(s);
-            if (item.amount <= 1)
-                Server.DestroyItem(i, item);
-            else
-                --item.amount;
+            i.consume(item);
         }
     }
 
@@ -1500,5 +1518,10 @@ public class Server
         DatabaseClient
                 .commandExecute("DELETE FROM locationflags WHERE locationId = "
                         + id + " AND flag='" + string + "' LIMIT 1;");
+    }
+
+    public static void HandleCraft(String string, int i, Connection c)
+    {
+        CraftSystem.tryCraft(string, i, getClient(c).controlledEntity);
     }
 }

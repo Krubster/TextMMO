@@ -18,6 +18,15 @@ public class SkillsSystem
 
     }
 
+    public static float getCraftSkillChance(float skReq, Skill s)
+    {
+        float f = 0;
+        float diff = s.value - skReq;
+        if (diff > 0)
+            f += diff / s.value;
+        return f;
+    }
+
     public static void tryRaiseSkill(Entity e, Skill s)
     {
         float h = Server.random.nextFloat();
