@@ -12,6 +12,7 @@ import ru.alastar.main.net.Server;
 public class GardenSystem
 {
 
+    // FULLY BROKEN!
     public static ArrayList<PlantsType> growingPlants = new ArrayList<PlantsType>();
 
     public static void StartGrowTimer()

@@ -98,7 +98,6 @@ public class Server
             LoadEntities();
             LoadInventories();
             LoadPlants();
-            GardenSystem.StartGrowTimer();
             FillWoods();
             FillMiningItems();
             SetupSpells();
