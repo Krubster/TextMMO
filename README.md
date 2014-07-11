@@ -1,7 +1,7 @@
 TextMMO
 =======
 
-Text MMORPG, written on Java
+Text MMORPG, written on Java. Fully free to distribute and editing.
 
 Including client and server
 
