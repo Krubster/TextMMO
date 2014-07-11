@@ -26,3 +26,4 @@ To Do:
 - Animals
 - Housing(?)
 - Add equip
+- Web status
