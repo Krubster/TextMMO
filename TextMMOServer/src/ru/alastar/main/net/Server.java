@@ -1,9 +1,18 @@
 package ru.alastar.main.net;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +22,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import com.esotericsoftware.kryonet.Connection;
 
@@ -39,6 +52,8 @@ import ru.alastar.game.worldwide.Location;
 import ru.alastar.game.worldwide.LocationFlag;
 import ru.alastar.game.worldwide.World;
 import ru.alastar.main.Main;
+import ru.alastar.main.Plugin;
+import ru.alastar.main.PluginInfo;
 import ru.alastar.main.handlers.*;
 import ru.alastar.main.net.requests.CommandRequest;
 import ru.alastar.main.net.responses.AddFlagResponse;
@@ -63,6 +78,7 @@ public class Server
     public static Hashtable<Integer, Entity>                    entities;
     public static Hashtable<String, Handler>                    commands;
     public static Hashtable<String, Float>                      plantsGrowTime;
+    public static Hashtable<String, Plugin>                     plugins;
 
     public static Random                                        random;
 
@@ -92,6 +108,7 @@ public class Server
             entities = new Hashtable<Integer, Entity>();
             commands = new Hashtable<String, Handler>();
             plantsGrowTime = new Hashtable<String, Float>();
+            plugins = new Hashtable<String, Plugin>();
 
             DatabaseClient.Start();
             LoadWorlds();
@@ -104,6 +121,8 @@ public class Server
             FillCommands();
             FillPlants();
             FillCrafts();
+            
+            LoadPlugins(); //Always at least!
         } catch (InstantiationException e)
         {
             Main.Log("[ERROR]", e.getLocalizedMessage());
@@ -181,6 +200,113 @@ public class Server
         } catch (Exception e)
         {
             handleError(e);
+        }
+    }
+
+    private static void LoadPlugins()
+    {  
+        Main.Log("[PLUGIN MANAGER]","Loading plugins...");
+        File plugDir = new File("plugins");
+        if(!plugDir.exists())
+        {
+            plugDir.mkdir();
+        }
+        else
+        {   
+
+           for(File plugin: plugDir.listFiles())
+            {
+                LoadPlugin(plugin);
+            } 
+           Main.Log("[PLUGIN MANAGER]","Plugins loaded! Count: " + plugins.size());
+        } 
+    }
+    
+
+    private static void LoadPlugin(File original)
+    {    
+        try
+     {
+           JarFile file = new JarFile(original);
+           ZipEntry e = file.getEntry("plugin.txt");
+           BufferedReader input;
+           InputStream in;
+           String pathToMainClass;
+           PluginInfo pluginInfo;
+           if(e != null)
+           {
+               in = file.getInputStream(e);
+               input = new BufferedReader(new InputStreamReader(in));
+               pluginInfo = BuildPluginInfo(input);
+               pathToMainClass = pluginInfo.getPathToMainClass();
+               
+               URL url = original.toURI().toURL();
+               URL[] urls = new URL[]{url};
+               
+               final ClassLoader cl = new URLClassLoader(urls);
+
+               @SuppressWarnings("unchecked")
+               Class<Plugin> cls = (Class<Plugin>)cl.loadClass(pathToMainClass);
+               Plugin plug = cls.newInstance();
+               plug.OnLoad();
+               plugins.put(pluginInfo.getName(), plug);
+               cl.clearAssertionStatus();
+               input.close();
+               in.close();
+           }
+           else
+           {
+               Main.Log("[PLUGIN MANAGER]","jar file missing plugin.txt file! Skipping...");
+           }
+           file.close();  
+           } catch (IOException | SecurityException | IllegalArgumentException | ClassNotFoundException | InstantiationException | IllegalAccessException e1)
+           {
+               e1.printStackTrace();
+           }
+    }
+
+    private static PluginInfo BuildPluginInfo(BufferedReader input)
+    { 
+        try
+    {
+        String name = "", path ="";
+        String[] authors = null, dep = null;
+        String e;
+
+        while((e = input.readLine()) != null)
+        {
+            if(e.split(":")[0].equals("name")){
+                name = e.split(":")[1];
+            }
+            else if(e.split(":")[0].equals("path")){
+                path = e.split(":")[1];
+            }
+            else if(e.split(":")[0].equals("authors")){
+                if(e.split(":").length > 1){
+                authors = new String[e.split(":")[1].split(",").length];
+                for(int i =0; i <  authors.length; ++i)
+                {
+                    authors[i] = e.split(":")[1].split(",")[i];
+                }
+            }}
+            else if(e.split(":")[0].equals("dependencies")){
+                if(e.split(":").length > 1){
+                dep = new String[e.split(":")[1].split(",").length];
+                
+                for(int i =0; i < dep.length; ++i)
+                {
+                    dep[i] = e.split(":")[1].split(",")[i];
+                }}
+            }
+
+        }
+        
+        PluginInfo p = new PluginInfo(name, path, authors, dep); 
+        return p;    
+        } catch (IOException e1)
+        {
+            e1.printStackTrace();
+            return null;
         }
     }
 

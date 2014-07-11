@@ -40,8 +40,10 @@ public class Main
         } catch (Exception e)
         {
             Log("[SERVER]", e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
     private static void CreateLogFile()
     {

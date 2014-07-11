@@ -1,0 +1,4 @@
+name:TestPlugin
+path:ru.alastar.main.MainClass
+authors:Alastar
+dependencies:
