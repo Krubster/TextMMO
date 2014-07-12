@@ -1,0 +1,4 @@
+name:WebStatus
+path:ru.alastar.net.Main
+authors:Alastar
+dependencies:

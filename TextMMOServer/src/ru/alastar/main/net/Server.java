@@ -247,8 +247,15 @@ public class Server
 
                @SuppressWarnings("unchecked")
                Class<Plugin> cls = (Class<Plugin>)cl.loadClass(pathToMainClass);
-               Plugin plug = cls.newInstance();
+               final Plugin plug = cls.newInstance();
+               Main.service.submit(new Runnable(){
+                   
+               @Override 
+               public void run(){
                plug.OnLoad();
+               }
+               
+               });
                plugins.put(pluginInfo.getName(), plug);
                cl.clearAssertionStatus();
                input.close();
