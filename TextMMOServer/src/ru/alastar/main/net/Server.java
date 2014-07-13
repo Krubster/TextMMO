@@ -2,15 +2,10 @@ package ru.alastar.main.net;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.ResultSet;
@@ -24,8 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import com.esotericsoftware.kryonet.Connection;
 
@@ -79,6 +72,7 @@ public class Server
     public static Hashtable<String, Handler>                    commands;
     public static Hashtable<String, Float>                      plantsGrowTime;
     public static Hashtable<String, Plugin>                     plugins;
+    public static File[][]                                      preparedPlugins;
 
     public static Random                                        random;
 
@@ -109,7 +103,7 @@ public class Server
             commands = new Hashtable<String, Handler>();
             plantsGrowTime = new Hashtable<String, Float>();
             plugins = new Hashtable<String, Plugin>();
-
+            preparedPlugins = new File[100][100];
             DatabaseClient.Start();
             LoadWorlds();
             LoadEntities();
@@ -166,6 +160,7 @@ public class Server
                             {
                                 Save();
                                 server.close();
+                                
                                 Main.writer.close();
                                 break;
                             }
@@ -187,6 +182,10 @@ public class Server
 
                 private void Save()
                 {
+                    for(Plugin p : plugins.values())
+                    {
+                        p.OnDisable();
+                    }
                     for (World w : worlds.values())
                     {
                         for (Location l : w.locations.values())
@@ -213,10 +212,10 @@ public class Server
         }
         else
         {   
-
+ 
            for(File plugin: plugDir.listFiles())
             {
-                LoadPlugin(plugin);
+               LoadPlugin(plugin);
             } 
            Main.Log("[PLUGIN MANAGER]","Plugins loaded! Count: " + plugins.size());
         } 
