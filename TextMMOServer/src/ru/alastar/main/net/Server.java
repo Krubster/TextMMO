@@ -242,7 +242,8 @@ public class Server
                URL url = original.toURI().toURL();
                URL[] urls = new URL[]{url};
                
-               final ClassLoader cl = new URLClassLoader(urls);
+               @SuppressWarnings("resource")
+            final ClassLoader cl = new URLClassLoader(urls);
 
                @SuppressWarnings("unchecked")
                Class<Plugin> cls = (Class<Plugin>)cl.loadClass(pathToMainClass);
