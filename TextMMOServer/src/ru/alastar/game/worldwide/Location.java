@@ -28,7 +28,7 @@ public class Location
     public ArrayList<Integer>                nearLocationsIDs;
     public static Hashtable<Integer, String> woods       = new Hashtable<Integer, String>();
     public static Hashtable<Integer, String> miningItems = new Hashtable<Integer, String>();
-
+    
     public Location(int i, String n, ArrayList<Integer> nlIDs,
             Hashtable<String, LocationFlag> flags)
     {
@@ -83,7 +83,7 @@ public class Location
             Server.SendTo(Server.getClientByEntity(entity).connection, r);
         }
     }
-
+    
     public void sendAll(String msg, String caption)
     {
         ChatSendResponse r = new ChatSendResponse();

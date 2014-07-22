@@ -1,15 +1,12 @@
 package ru.alastar.main.handlers;
 
-import com.esotericsoftware.kryonet.Connection;
+import ru.alastar.main.net.ConnectedClient;
 
-public class Handler
+public abstract class Handler
 {
     public int    numOfArgs   = 0;
     public String description = "Standard command handler, handles nothing";
 
-    public void execute(String[] args, Connection c)
-    {
-
-    }
+    public abstract void execute(String[] args, ConnectedClient c);
 
 }

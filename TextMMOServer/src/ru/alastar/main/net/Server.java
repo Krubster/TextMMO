@@ -751,7 +751,7 @@ public class Server
         clients.remove(connection.getRemoteAddressUDP());
     }
 
-    public static void Login(String login, String pass, Connection c)
+    public static void Login(String login, String pass, ConnectedClient client)
     {
         try
         {
@@ -766,9 +766,8 @@ public class Server
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = true;
-                SendTo(c, r);
+                SendTo(client.connection, r);
 
-                ConnectedClient client = getClient(c);
                 if (!client.logged)
                 {
                     client.login = l.getString("login");
@@ -780,7 +779,7 @@ public class Server
                 {
                     MessageResponse r1 = new MessageResponse();
                     r1.msg = "This account is already logged in!";
-                    SendTo(c, r1);
+                    SendTo(client.connection, r1);
                 }
             } else
             {
@@ -788,7 +787,7 @@ public class Server
 
                 LoginResponse r = new LoginResponse();
                 r.succesful = false;
-                SendTo(c, r);
+                SendTo(client.connection, r);
             }
 
         } catch (SQLException e)
@@ -969,7 +968,12 @@ public class Server
     {
         server.sendToUDP(c.getID(), o);
     }
-
+    
+    public static void SendTo(ConnectedClient c, Object o)
+    {
+        server.sendToUDP(c.connection.getID(), o);
+    }
+    
     public static ConnectedClient getClientByEntity(Entity e1)
     {
         for (ConnectedClient c : clients.values())
@@ -985,9 +989,8 @@ public class Server
         return null;
     }
 
-    public static void ProcessChat(String msg, Connection connection)
+    public static void ProcessChat(String msg, ConnectedClient c)
     {
-        ConnectedClient c = getClient(connection);
         if (c.controlledEntity != null)
         {
             c.controlledEntity.loc.sendAll(msg, c.controlledEntity.caption);
@@ -1098,7 +1101,7 @@ public class Server
     }
 
     public static void ProcessRegister(String login, String pass, String mail,
-            String name, String race, Connection connection)
+            String name, String race, ConnectedClient c)
     {
         try
         {
@@ -1110,13 +1113,13 @@ public class Server
             if (regRS.next())
             {
                 r.successful = false;
-                Server.SendTo(connection, r);
+                Server.SendTo(c, r);
             } else
             {
                 CreateAccount(login, pass, mail, name, race,
-                        getClient(connection));
+                        c);
                 r.successful = true;
-                Server.SendTo(connection, r);
+                Server.SendTo(c, r);
             }
         } catch (SQLException e)
         {
@@ -1361,9 +1364,8 @@ public class Server
         return -1;
     }
 
-    public static void HandleMove(int id, Connection connection)
+    public static void HandleMove(int id, ConnectedClient c)
     {
-        ConnectedClient c = getClient(connection);
         // Main.Log("[MOVE]", "ID: " + moveRequest.id);
         // for(int near: c.controlledEntity.loc.nearLocationsIDs)
         // {
@@ -1416,13 +1418,12 @@ public class Server
         }
     }
 
-    public static void HandleAction(ActionType action, Connection connection,
+    public static void HandleAction(ActionType action, ConnectedClient c,
             String[] args)
     {
         // Main.Log("[DEBUG]", "Handling action " + action.name());
         try
         {
-            ConnectedClient c = getClient(connection);
             switch (action)
             {
                 case Cut:
@@ -1450,11 +1451,10 @@ public class Server
     }
 
     public static void HandleCast(String spellName, int eId,
-            Connection connection)
+            ConnectedClient c)
     {
         try
         {
-            ConnectedClient c = getClient(connection);
             c.controlledEntity.tryCast(spellName.toLowerCase(), eId);
         } catch (Exception e)
         {
@@ -1462,11 +1462,10 @@ public class Server
         }
     }
 
-    public static void HandleAttack(int id, Connection connection)
+    public static void HandleAttack(int id, ConnectedClient c)
     {
         try
         {
-            ConnectedClient c = getClient(connection);
             c.controlledEntity.startAttack(id);
         } catch (Exception e)
         {
@@ -1602,7 +1601,7 @@ public class Server
             if (Server.commands.containsKey(commandKey))
             {
                 Server.commands.get(commandKey).execute(commandRequest.args,
-                        connection);
+                        getClient(connection));
             } else
             {
                 Server.warnClient(getClient(connection),
@@ -1652,8 +1651,8 @@ public class Server
                         + id + " AND flag='" + string + "' LIMIT 1;");
     }
 
-    public static void HandleCraft(String string, int i, Connection c)
+    public static void HandleCraft(String string, int i, ConnectedClient c)
     {
-        CraftSystem.tryCraft(string, i, getClient(c).controlledEntity);
+        CraftSystem.tryCraft(string, i, c.controlledEntity);
     }
 }

@@ -1,7 +1,6 @@
 package ru.alastar.main.handlers;
 
-import com.esotericsoftware.kryonet.Connection;
-
+import ru.alastar.main.net.ConnectedClient;
 import ru.alastar.main.net.Server;
 
 public class RegisterHandler extends Handler
@@ -13,7 +12,7 @@ public class RegisterHandler extends Handler
     }
 
     @Override
-    public void execute(String[] args, Connection c)
+    public void execute(String[] args, ConnectedClient c)
     {
         try
         {

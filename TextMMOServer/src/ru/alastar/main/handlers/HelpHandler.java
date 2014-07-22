@@ -1,8 +1,7 @@
 package ru.alastar.main.handlers;
 
-import com.esotericsoftware.kryonet.Connection;
-
 import ru.alastar.main.net.Server;
+import ru.alastar.main.net.ConnectedClient;
 
 public class HelpHandler extends Handler
 {
@@ -13,7 +12,7 @@ public class HelpHandler extends Handler
     }
 
     @Override
-    public void execute(String[] args, Connection c)
+    public void execute(String[] args, ConnectedClient c)
     {
         try
         {
@@ -25,7 +24,7 @@ public class HelpHandler extends Handler
                     msg += k + " - " + Server.commands.get(k).description
                             + "\n";
                 }
-                Server.warnClient(Server.getClient(c), msg);
+                Server.warnClient(c, msg);
             }
         } catch (Exception e)
         {
