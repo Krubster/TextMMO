@@ -36,6 +36,7 @@ import ru.alastar.game.Skill;
 import ru.alastar.game.Skills;
 import ru.alastar.game.Statistic;
 import ru.alastar.game.Stats;
+import ru.alastar.game.ai.AI;
 import ru.alastar.game.security.Crypt;
 import ru.alastar.game.spells.Heal;
 import ru.alastar.game.systems.CraftSystem;
@@ -72,7 +73,7 @@ public class Server
     public static Hashtable<String, Handler>                    commands;
     public static Hashtable<String, Float>                      plantsGrowTime;
     public static Hashtable<String, Plugin>                     plugins;
-    public static File[][]                                      preparedPlugins;
+    public static Hashtable<Integer, AI>                        ais;
 
     public static Random                                        random;
 
@@ -103,7 +104,8 @@ public class Server
             commands = new Hashtable<String, Handler>();
             plantsGrowTime = new Hashtable<String, Float>();
             plugins = new Hashtable<String, Plugin>();
-            preparedPlugins = new File[100][100];
+            ais = new Hashtable<Integer, AI>();
+
             DatabaseClient.Start();
             LoadWorlds();
             LoadEntities();
@@ -580,6 +582,7 @@ public class Server
                             skills, stats, knownSpells);
                     e.loc.AddEntity(e);
                     entities.put(e.id, e);
+                    LoadAI(e);
                 }
             }
         } catch (SQLException e)
@@ -988,7 +991,32 @@ public class Server
         }
         return null;
     }
-
+    
+    private static AI LoadAI(Entity e)
+    {
+        try
+        {
+            ResultSet allAIs = DatabaseClient
+                    .commandExecute("SELECT * FROM ai WHERE entityId="+e.id);
+            AI ai = null;
+            while (allAIs.next())
+            {
+                ai = (AI) Class.forName(allAIs.getString("class"))
+                        .newInstance();
+                ai.setEntity(e);
+                ai.setReactionTime(allAIs.getFloat("reaction"));
+                ais.put(allAIs.getInt("entityId"), ai);
+              
+            }
+            return ai;
+        } catch (SQLException | InstantiationException | IllegalAccessException
+                | ClassNotFoundException ex)
+        {
+            Server.handleError(ex);
+        }
+        return null;
+    }
+    
     public static void ProcessChat(String msg, ConnectedClient c)
     {
         if (c.controlledEntity != null)
@@ -996,7 +1024,12 @@ public class Server
             c.controlledEntity.loc.sendAll(msg, c.controlledEntity.caption);
         }
     }
-
+    
+    public static void ProcessChat(String msg, Entity c)
+    {
+        c.loc.sendAll(msg, c.caption);
+    }
+    
     public static void saveEntity(Entity entity)
     {
         try
