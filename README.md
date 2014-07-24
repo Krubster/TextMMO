@@ -20,6 +20,5 @@ Dependencies:
 To Do:
 =======
 - Fix skills formulas(50%)
-- AI
 - Housing(?)
 - Add equip
