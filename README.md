@@ -5,6 +5,8 @@ Text MMORPG, written on Java. Fully free to distribute and editing.
 
 Including client and server
 
+ABANDONED
+
 + Server version 1.15.10(Stable)
 + Client version 1.14.3(Stable)
 
